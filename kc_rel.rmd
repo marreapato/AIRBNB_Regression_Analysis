@@ -1,0 +1,18 @@
+---
+title: "King's County Housing - Relatório"
+author: "João Vitor, Júnia Ortiz e Lucas Rabelo"
+date: "21/09/2021"
+output: pdf_document
+---
+
+# Introdução
+
+## King's County
+
+  King's County é um condado americano onde possui várias cidades diferentes, longe da parte litorânea do estado da Califórnia nos Estados Unidos. A base de dados de King's County contém informações sobre o mercado imobiliário local, sendo algumas destas:
+  
+  - **Id:** id das casas vendidas
+  - **Date:** data da venda
+  - **Price:** preço de venda da casa.
+  - **Bathrooms:** Quantidade de banheiros, onde o valor decimal significa que o quarto tem banheiro porém sem choveiro.
+  -
