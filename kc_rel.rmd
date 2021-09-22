@@ -15,4 +15,19 @@ output: pdf_document
   - **Date:** data da venda
   - **Price:** preço de venda da casa.
   - **Bathrooms:** Quantidade de banheiros, onde o valor decimal significa que o quarto tem banheiro porém sem choveiro.
-  -
+  - **Sqft_living:** Medida em pés quadrados da parte interior do apartamento.
+  - **Sqft_lot:** Medida em pés quadrados do terreno.
+  - **floors:** Número de pisos.
+  - **Waterfront:** Variável *dummy* que diz se há (1) ou não (0) visão para frente da água (como não há mar, supõe-se rios ou lagos).
+  - **View:** Nota de 0 a 4 para a Vista da propriedade.
+  - **Condition:** Nota de 1 a 5 das condições do imóvel.
+  - **Grade:** Nota de 1 a 13, onde 1-3 indica que aa construção e seu design são "simples", até 10 indica um nível mediano de construção e design e de 11-13 indica um nível alto de construção e design.
+  - **Sqft_above:** Medida em pés quadrados dos pisos acima do chão.
+  - **Sqft_basement:** Medida em pés quadrados do sótão.  
+  - **Yr_built:** Ano de construção da casa.
+  - **Yr_renovated:** Ano em que a casa foi renovada
+  - **Zipcode:** "CEP" da área.
+  - **lat:** Latitude.
+  - **long:** Longitude.
+  - **Sqft_living_15:** Medida em pés quadrados do interior do imóvel dos 15 vizinhos mais próximos.
+  - **Sqft_lot15:** Medida em pés quadrados dos terrenos dos 15 vizinhos mais próximos.
