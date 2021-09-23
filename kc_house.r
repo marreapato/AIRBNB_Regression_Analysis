@@ -22,3 +22,13 @@ ggplot(dados,aes(y=dados$bedrooms,x=as.factor(dados$waterfront),fill=as.factor(d
 #analisar outliers
 
 ggplot(dados,aes(x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_bar()+theme_fivethirtyeight()+labs(title="Vista para lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+
+dados$grade_label <- NA
+
+dados$grade_label[dados$grade<=3] <- "Baixa"
+dados$grade_label[dados$grade>3&dados$grade<=10] <- "Média"
+dados$grade_label[dados$grade>=11] <- "Alta"
+
+
+
+ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label)))+geom_bar()+theme_fivethirtyeight()+labs(title="Avaliação das qualidades do imóvel")+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
