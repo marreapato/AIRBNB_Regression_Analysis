@@ -5,11 +5,21 @@ date: "21/09/2021"
 output: pdf_document
 ---
 
+```{r, include=FALSE}
+
+#install.packages("tidyverse")
+#install.packages("ggthemes")
+library(tidyverse)
+library(ggthemes)
+dados <- read.csv("kc_house_data.csv")
+options(scipen = 999)
+```
+
 # Introdução
 
 ## King's County
 
-  King's County é um condado americano onde possui várias cidades diferentes, longe da parte litorânea do estado da Califórnia nos Estados Unidos. A base de dados de King's County contém informações sobre o mercado imobiliário local, sendo algumas destas:
+  King's County é um condado americano onde possui várias cidades diferentes do estado de Washington nos Estados Unidos, incluindo a grande cidade de Seattle. A base de dados de King's County contém informações sobre o mercado imobiliário residencial local, de Maio de 2014 até Maio de 2015 sendo algumas destas:
   
   - **Id:** id das casas vendidas
   - **Date:** data da venda
@@ -17,17 +27,75 @@ output: pdf_document
   - **Bathrooms:** Quantidade de banheiros, onde o valor decimal significa que o quarto tem banheiro porém sem choveiro.
   - **Sqft_living:** Medida em pés quadrados da parte interior do apartamento.
   - **Sqft_lot:** Medida em pés quadrados do terreno.
-  - **floors:** Número de pisos.
-  - **Waterfront:** Variável *dummy* que diz se há (1) ou não (0) visão para frente da água (como não há mar, supõe-se rios ou lagos).
+  - **Floors:** Número de pisos.
+  - **Waterfront:** Variável *dummy* que diz se há (1) ou não (0) visão para frente do mar, lagos ou rios.
   - **View:** Nota de 0 a 4 para a Vista da propriedade.
   - **Condition:** Nota de 1 a 5 das condições do imóvel.
-  - **Grade:** Nota de 1 a 13, onde 1-3 indica que aa construção e seu design são "simples", até 10 indica um nível mediano de construção e design e de 11-13 indica um nível alto de construção e design.
+  - **Grade:** Nota de 1 a 13, onde 1-3 indica que a construção e seu design são "simples", até 10 indica um nível mediano de construção e design e de 11-13 indica um nível alto de construção e design.
   - **Sqft_above:** Medida em pés quadrados dos pisos acima do chão.
   - **Sqft_basement:** Medida em pés quadrados do sótão.  
   - **Yr_built:** Ano de construção da casa.
   - **Yr_renovated:** Ano em que a casa foi renovada
   - **Zipcode:** "CEP" da área.
-  - **lat:** Latitude.
-  - **long:** Longitude.
+  - **Lat:** Latitude.
+  - **Long:** Longitude.
   - **Sqft_living_15:** Medida em pés quadrados do interior do imóvel dos 15 vizinhos mais próximos.
   - **Sqft_lot15:** Medida em pés quadrados dos terrenos dos 15 vizinhos mais próximos.
+  
+## O mercado Imobiliário Residencial em King's County
+
+ Antes de se avaliar questões de modelagem para o mercado imobiliário de King's County, o perfil do mercado de imóveis residenciais local deve ser construído. O imóvel residencial mais barato no condado ficou em 75.000 USD (doláres), enquanto o preço médio de um imóvel no local era de 540.088 USD e o imóvel mais caro ficou em 7.700.000 USD, em média o número de quartos é de 3, enquanto o número máximo de quartos é de 33 o que pode ser uma observação *outlier*, visto que a propriedade somente tem um banheiro e algumas suítes, portanto posteriormente será discutida a exclusão dessa propriedade da base de dados, o número médio de banheiros é de 2, a representação gráfica dessas informações está suscinta no **(Gráfico 1)**.
+
+ 
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+hist(dados$price,main="Preço dos imóveis Residenciais do Condado",xlab="Preço",ylab="Quantidade",col = "aquamarine")
+hist(dados$bathrooms,main="Número de banheiros dos imóveis Residenciais do Condado",xlab="Número de Banheiros",ylab="Quantidade",col = "aquamarine")
+hist(dados$bedrooms,main="Número de quartos dos imóveis Residenciais do Condado",xlab="Número de Quartos",ylab="Quantidade",col = "aquamarine")
+```
+
+### Gráfico 1 - Perfil do Mercado Imobiliário Condado.
+
+ Referente as características territoriais das propriedades, a média de pés quadrados dos terrenos do condado é de 15.107 pés, no entanto até metade dos imóveis tem um terreno de 7618 pés quadrados e a média de pés quadrados da parte interior do imóvel é de 1.910 pés quadrados.
+ 
+
+
+# Anexo
+
+```
+#install.packages("tidyverse")
+#install.packages("ggthemes")
+library(tidyverse)
+library(ggthemes)
+dados <- read.csv("kc_house_data.csv")
+
+summary(dados)
+mean(dados$bedrooms)
+mean(dados$bathrooms)
+
+hist(dados$bathrooms)
+hist(dados$bedrooms)
+hist(dados$sqft_basement)
+hist(dados$sqft_living)
+hist(dados$sqft_above)
+hist(dados$grade)
+
+ggplot(dados,aes(x=dados$bedrooms))+geom_histogram()+theme_economist_white()+labs(title="Vista para lagos ou rios")+scale_fill_continuous_tableau()+theme(legend.position = "none")+stat_bin(bins = 20) 
+
+ggplot(dados,aes(y=dados$bedrooms,x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_boxplot()+theme_fivethirtyeight()+labs(title="Vista para lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+
+#analisar outliers
+
+ggplot(dados,aes(x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_bar()+theme_fivethirtyeight()+labs(title="Vista para mar, lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+
+dados$grade_label <- NA
+
+dados$grade_label[dados$grade<=3] <- "Baixa"
+dados$grade_label[dados$grade>3&dados$grade<=10] <- "Média"
+dados$grade_label[dados$grade>=11] <- "Alta"
+
+
+
+ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label)))+geom_bar()+theme_fivethirtyeight()+labs(title="Avaliação das qualidades do imóvel")+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+
+
+```
