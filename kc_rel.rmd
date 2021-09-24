@@ -56,13 +56,25 @@ ggplot(dados,aes(y=dados$bedrooms,x=as.factor(dados$waterfront),fill=as.factor(d
 
 ### Gráfico 1 - Perfil do Mercado Imobiliário Condado.
 
- Referente as características territoriais das propriedades, a média de pés quadrados dos terrenos do condado é de 15.107 pés, no entanto até metade dos imóveis tem um terreno de 7618 pés quadrados e a média de pés quadrados da parte interior do imóvel é de 1.910 pés quadrados.
-
-## Qualidade do Mercado Local.
+ Referente as características territoriais das propriedades, a média de pés quadrados dos terrenos do condado é de 15.107 pés, no entanto até metade dos imóveis tem um terreno de 7.618 pés quadrados e a média de pés quadrados da parte interior do imóvel é de 1.910 pés quadrados. Referente a qualidade do Mercado Local, a proporção de imóveis imobiliários com vista para mar, lagos ou rios é baixa, a maioria dos imóveis residenciais não possui esse tipo de vista, além disso a maioria das residencias está com avaliação média ou boa, sendo poucos os imóveis categorizados com uma qualidade alta ou baixa, as informações das qualidades dos imóveis está representada visualmente no **(Gráfico 2)**.
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
 
+ggplot(dados,aes(x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_bar()+theme_fivethirtyeight()+labs(title="Vista para mar, lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+
+dados$grade_label <- NA
+
+dados$grade_label[dados$grade<=3] <- "Baixa"
+dados$grade_label[dados$grade>3&dados$grade<=10] <- "Média"
+dados$grade_label[dados$grade>=11] <- "Alta"
+
+
+
+ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label)))+geom_bar()+theme_fivethirtyeight()+labs(title="Avaliação da qualidade do imóvel",x="Qualidade")+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+
+
 ```
+**Gráfico 2 - Informações referentes a qualidade do imóvel.**
 
 
 # Anexo
@@ -101,7 +113,10 @@ dados$grade_label[dados$grade>=11] <- "Alta"
 
 
 
-ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label)))+geom_bar()+theme_fivethirtyeight()+labs(title="Avaliação das qualidades do imóvel")+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label)))+geom_bar()+theme_fivethirtyeight()+labs(title="Avaliação da qualidade do imóvel")+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+
+cor(dados[,3:14])
+
 
 
 ```
