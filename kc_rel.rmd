@@ -44,19 +44,25 @@ options(scipen = 999)
   
 ## O mercado Imobiliário Residencial em King's County
 
- Antes de se avaliar questões de modelagem para o mercado imobiliário de King's County, o perfil do mercado de imóveis residenciais local deve ser construído. O imóvel residencial mais barato no condado ficou em 75.000 USD (doláres), enquanto o preço médio de um imóvel no local era de 540.088 USD e o imóvel mais caro ficou em 7.700.000 USD, em média o número de quartos é de 3, enquanto o número máximo de quartos é de 33 o que pode ser uma observação *outlier*, visto que a propriedade somente tem um banheiro e algumas suítes, portanto posteriormente será discutida a exclusão dessa propriedade da base de dados, o número médio de banheiros é de 2, a representação gráfica dessas informações está suscinta no **(Gráfico 1)**.
+ Antes de se avaliar questões de modelagem para o mercado imobiliário de King's County, o perfil do mercado de imóveis residenciais local deve ser construído. O imóvel residencial mais barato no condado ficou em 75.000 USD (doláres), enquanto o preço médio de um imóvel no local era de 540.088 USD e o imóvel mais caro ficou em 7.700.000 USD, em média o número de quartos é de 3, enquanto o número máximo de quartos é de 33 o que pode ser uma observação *outlier*, visto que a propriedade somente tem um banheiro e algumas suítes e nem possui vista para mar, lagos ou rios, portanto posteriormente será discutida a exclusão dessa propriedade da base de dados, o número médio de banheiros é de 2, a representação gráfica dessas informações está suscinta no **(Gráfico 1)**.
 
  
 ```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
 hist(dados$price,main="Preço dos imóveis Residenciais do Condado",xlab="Preço",ylab="Quantidade",col = "aquamarine")
 hist(dados$bathrooms,main="Número de banheiros dos imóveis Residenciais do Condado",xlab="Número de Banheiros",ylab="Quantidade",col = "aquamarine")
 hist(dados$bedrooms,main="Número de quartos dos imóveis Residenciais do Condado",xlab="Número de Quartos",ylab="Quantidade",col = "aquamarine")
+ggplot(dados,aes(y=dados$bedrooms,x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_boxplot()+theme_classic()+labs(title="Número de quartos do imóvel segundo vista para lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") +labs(x="Possuí vista para mar, lagos ou rios?",y="Número de Quartos")
 ```
 
 ### Gráfico 1 - Perfil do Mercado Imobiliário Condado.
 
  Referente as características territoriais das propriedades, a média de pés quadrados dos terrenos do condado é de 15.107 pés, no entanto até metade dos imóveis tem um terreno de 7618 pés quadrados e a média de pés quadrados da parte interior do imóvel é de 1.910 pés quadrados.
- 
+
+## Qualidade do Mercado Local.
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+
+```
 
 
 # Anexo
