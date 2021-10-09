@@ -367,8 +367,16 @@ olsrr::ols_plot_resid_lev(modelo)
 
 
 ```
- Mais especificamente no gráfico de pontos de alavanca e resíduos estudentizados temos inicialmente alguns pontos, que não parecem ser situações que não fossem plausíveis na vida real, como o 36 identificado como ponto discrepante, sendo este um indivíduo de 54 anos e IMC de 47,41, na tabela em (https://www.ricardogozzano.com.br/calculadora-imc/), essa classificação é de obesidade mórbida ou também conhecida como de grau 3, já o indivíduo classificado como ponto 34 tem 42 anos e teve um imc de 26,02 classificado como sobrepeso, o ponto 90 é um indivíduo de 45 anos classificado como obesidade de grau 1. Já o ponto 71 é realmente estranho, indica que tem um indivíduo em risco sério de saúde ou que foi registrada errôneamente, pois sua idade é de 22 anos e seu IMC de 52,58. 
+ Mais especificamente no gráfico de pontos de alavanca e resíduos estudentizados temos inicialmente alguns pontos, que não parecem ser situações que não fossem plausíveis na vida real, como o 36 identificado como ponto discrepante, sendo este um indivíduo de 54 anos e IMC de 47,41, na tabela em (https://www.ricardogozzano.com.br/calculadora-imc/), essa classificação é de obesidade mórbida ou também conhecida como de grau 3, já o indivíduo classificado como ponto 34 tem 42 anos e teve um imc de 26,02 classificado como sobrepeso, o ponto 90 é um indivíduo de 45 anos classificado como obesidade de grau 1. Já o ponto 71 é realmente estranho, indica que tem um indivíduo em risco sério de saúde ou que foi registrada errôneamente, pois sua idade é de 22 anos e seu IMC de 52,58. Para os gráficos dos dfbeta tivemos:
  
+```{r, echo = F,message=FALSE}
+#install.packages("olsrr")
+library("olsrr")
+olsrr::ols_plot_dfbetas(modelo)
+
+
+```
+
 # Apêndice
 
 ```{r ref.label=knitr::all_labels(), echo = T, eval = F}
