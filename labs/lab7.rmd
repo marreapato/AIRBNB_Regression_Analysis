@@ -357,6 +357,16 @@ modelo$residuals <- studres(modelo)
 plot(modelo, which = 5)
 
 ```
+
+ A primeira vista o gráfico das distâncias de Cook, sugere que não há pontos influentes em relação a distância de Cook, no entanto também sugere que os pontos 85, 90 e 71 sejam investigados, referente ao ponto 90 já haviamos demonstrado preocupação em relação aos gráficos anteriores. Para os pontos de alavanca e resíduos estudentizados tivemos:
+ 
+```{r, echo = F,message=FALSE}
+#install.packages("olsrr")
+library("olsrr")
+olsrr::ols_plot_resid_lev(modelo)
+
+
+```
 # Apêndice
 
 ```{r ref.label=knitr::all_labels(), echo = T, eval = F}
