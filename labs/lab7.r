@@ -1,11 +1,13 @@
-#install.packages("tidyverse")
 library(tidyverse)
-library(MASS)
+#install.packages("corrplot")
+library(corrplot)
 
-###########3regressao multipla
-fumantes <- read.csv("lab7.csv")[,-1]
+dados <- read.csv("lab8.csv")
 
-model <- lm(fumantes$charges~fumantes$bmi+fumantes$age)
+summary(dados)
 
-plot(rstudent(model),x=model$fitted.values)
+cor(dados)
+dados <- dados[,-1]
 
+corrplot(cor(dados), type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
