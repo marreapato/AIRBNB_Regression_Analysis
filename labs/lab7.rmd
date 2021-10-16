@@ -59,7 +59,7 @@ ggpairs(dados, lower = list(continuous = "smooth"))
 
 ### Modelo Q=2
 
- O primeiro modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2$, testando os betas estimados do modelo todos estiveram com um P-valor<0,0001, sendo portanto os valores dos parâmetros diferentes de 0 a um nível de 5% de significância, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.40), o gráfico de normalidade
+ O primeiro modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2$, testando os betas estimados do modelo todos estiveram com um P-valor<0,0001, sendo portanto os valores dos parâmetros diferentes de 0 a um nível de 5% de significância, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.40), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de Cook, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
@@ -87,6 +87,8 @@ bptest(fit)
 
 ### Modelo Q=3
 
+ O segundo modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2+\beta_3(Tempo_i)^3$, testando os betas estimados do modelo quase todos estiveram com um $P-valor\leq0,01$, exceto pelo $\beta_3$ que foi de 0,62, sendo portanto os valores dos parâmetros $\beta_1$ e $\beta_2$ diferentes de 0 a um nível de 5% de significância, já o $\beta_3$ sendo 0, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Similar ao ajuste anterior, os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.50), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de Cook, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
+
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
 
@@ -110,6 +112,8 @@ bptest(fit)
 
 
 ### Modelo Q=2 Ortogonal
+
+ O terceiro modelo polinomial, foi o modelo de ordem polinomial 2, $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2$, no entanto consideranto os polinômios ortogonais, testando os betas estimados do modelo todos estiveram com um $P-valor\leq0,0001$, sendo portanto os valores dos parâmetros $\beta_1$ e $\beta_2$ diferentes de 0 a um nível de 5% de significância, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Similar ao ajuste anterior, os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0,40), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de *Cook*, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
@@ -135,6 +139,8 @@ bptest(fit_ort)
 
 ### Modelo Q=3 Ortogonal
 
+ O quarto modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2+\beta_3(Tempo_i)^3$, no entanto considerando os polinômios ortogonais, testando os betas estimados do modelo quase todos estiveram com um $P-valor\leq0,01$, exceto pelo $\beta_3$ que foi de 0,62, sendo portanto os valores dos parâmetros $\beta_1$ e $\beta_2$ diferentes de 0 a um nível de 5% de significância, já o $\beta_3$ sendo 0, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Similar ao ajuste anterior, os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.50), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de Cook, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
+
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
@@ -157,6 +163,11 @@ shapiro.test(fit_ort$residuals)
 bptest(fit_ort)
 
 ```
+
+### Informação geral referente aos modelos
+
+Os quatro modelos ajustados apresentaram $R^2$ múltiplos de 0.28, e $R^2$ ajustados de 0,27, a comparação de modelos será realizada a seguir utilizando o príncipio do resíduo condicional.
+
 # Apêndice
 
 ```{r ref.label=knitr::all_labels(), echo = T, eval = F}
