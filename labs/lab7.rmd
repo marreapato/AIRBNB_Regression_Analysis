@@ -1,34 +1,25 @@
 ---
-title: "Laboratório 7"
+title: "Laboratório 8"
 author: "João Vítor Rocha, Júnia Ortiz, Lucas Rabelo"
 output: 
   pdf_document:
     fig_caption: yes
 ---
 
-\renewcommand{\figurename}{Figura}
-\renewcommand{\tablename}{Tabela}
-
 ```{r, echo = F, warning=F, include=F}
 
-library(kableExtra)
-library(dplyr)
+library(tidyverse)
+#install.packages("corrplot")
+library(corrplot)
+#install.packages("GGally")
+library(GGally)
+library(MASS)
+#install.packages("lmtest")
+library(lmtest)
+#preço e tempo de construção da casa
+dados <- read.csv("lab8.csv")
 
-dados <- read.csv("lab7.csv")
 
-attach(dados)
-
-var <- c("Age (em anos)", "BMI", "Charges (em dólares)")
-medias <- c(round(mean(age), 2), round(mean(bmi), 2), round(mean(charges), 2))
-medianas <- c(42, 33.11, 37484)
-min <- c(18, 19.8, 16578)
-max <- c(64, 52.58, 63770)
-sd <- c(round(sd(age), 2), round(sd(bmi), 2), round(sd(charges), 2))
-
-descritiva <- rbind(medias, medianas, min, max, sd)
-colnames(descritiva) <- var
-rownames(descritiva) <- c("Média", "Mediana", "Mínimo", "Máximo", "Desvio Padrão")
-descritiva <- t(descritiva)
 
 ```
 
@@ -36,367 +27,31 @@ descritiva <- t(descritiva)
 
 # Introdução
 
-Este relatório apresenta uma análise do custo do seguro saúde dos pacientes fumantes que moram na região sudeste dos Estados Unidos. A partir dos dados de 91 indivíduos, analisaremos a relação entre o custo do seguro saúde, o IMC dos pacientes e suas idades. 
-
-Para isso, um modelo de Regressão Linear Múltipla será ajustado.
+  Temos dados de diversos imóveis, juntamente com algumas informações referentes ao metro, preço, quantidade de lojas e o tempo de construção do imóvel. Como o ajuste linear do modelo não foi adequado, partimos para um ajuste polinomial.
 
 # Análise Descritiva e Exploratória
 
-Primeiramente, para compreender melhor o conjunto de dados que foi analisado, uma análise descritiva e exploratória dos dados foi realizada:
+ O preço médio foi de 38,58 USD, além disso em média os imóveis tem 916,93 metros, em média 4 lojas estão ao redor dos imóveis, sendo que 75% dos imóveis tem até 6 lojas em seus arredores, o tempo médio de construção dos imóveis é de 17,92. Na matrix de correlação abaixo, a maior correlação positiva está entre a loja e o preço. As maiores correlações negativas estão entre o metro do imóvel e o número de lojas e entre o preço e o metro, a correlação entre o preço e o tempo de construção do imóvel é levemente negativa.
 
-## Variáveis
+```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
-As seguintes variáveis compõem o conjunto de dados analisado:
+summary(dados)
 
-- Age: idade, em anos completos, do paciente;
-- BMI: Índice de Massa Corpórea (IMC) do paciente;
-- Charges: preço do seguro saúde, em dólares, do paciente.
+cor(dados)
+dados <- dados[,-1]
 
-
-## Medidas Descritivas
-
-Na Tabela 1, é possível encontrar, para todas as variáveis, as principais medidas descritivas:
-
-```{r, echo = F}
-
-kable(descritiva, digits = 2, align = "c", caption = "Medidas Descritivas das Variáveis")
+corrplot(cor(dados), type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
 
 ```
 
-## Idade dos pacientes
+ Para melhor visualizar as correlações, no gráfico abaixo, tempos as correlações entre o preço e o tempo (-0.18), onde seu gráfico de dispersão se assemelha muito a uma parábola, o preço e a quantidade de lojas tem uma correlação moderadamente alta (0,58), a quantidade de lojas e o metro do imóvel apresentam uma correlação negativa (-0,593), onde, surpreendentemente, quanto maior o metro do imóvel, menor será o número de lojas.
 
-Iniciando com a idade dos pacientes, como é possível observar na Tabela 1 temos que a idade média entre os 91 indivíduos estudados é de 39.74 anos. A idade mediana observada foi de 42 anos e as idades mínimas e máximas foram 18 anos e 64 anos, respectivamente. 
+```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
-Assim, isso nos indica que estamos estudando um público fumante que mora no sudeste dos Estados Unidos e tem idades entre 18 e 64 anos.
-
-O desvio encontrado para as idades foi de 14.07.
-
-A seguir, a Figura 1 apresenta um boxplot e um histograma para uma melhor visualização dos dados:
-
-```{r figs, echo = F, fig.cap="\\label{fig:figs} Histograma e Boxplot das idades dos pacientes"}
-
-par(mfrow = c(1,2))
-
-boxplot(age, main = "Boxplot - Idades dos pacientes", ylab = "Idades dos pacientes (em anos)", col = "white")
-
-hist(age, ylab = "Frequência", xlab = "Idades dos pacientes (em anos)",
-main = "Histograma - Idades dos pacientes")
+ggpairs(dados, lower = list(continuous = "smooth"))
 
 ```
-
-## IMC dos pacientes
-
-```{r, echo = F, warning=F, include=F}
-
-var1 <- c("Classificação", "IMC")
-classificacao <- c("Abaixo do Peso", "Peso Ideal", "Sobrepeso", "Obesidade Grau 1", "Obesidade Grau 2", "Obesidade Grau 3 ou Mórbida")
-IMC <- c("Abaixo de 18,5", "Entre 18,6 e 24,9", "Entre 25 e 29,9", "Entre 30 e 34,9", "Entre 35 e 39,9", "Acima de 40")
-
-tabIMC <- cbind(classificacao, IMC)
-colnames(tabIMC) <- var1
-
-```
-
-Em relação aos IMC dos pacientes, antes de entrarmos na análise descritiva dos dados é importante um pouco do contexto do significado do IMC. Desta forma, a Tabela 2 ilustra o que os valores encontrados em um cálculo de IMC representam.
-
-```{r, echo = F}
-
-kable(tabIMC, digits = 2, align = "c", caption = "Classificações do IMC") %>% 
-  kable_styling(latex_options = "HOLD_position")
-
-```
-
-
-Assim, na Tabela 1, podemos observar que o valor mínimo de IMC observado para os 91 pacientes foi de 19.8 (classificação de peso ideal), o valor mediano observado foi de 33.11 (classificação de obesidade grau 1) e o valor máximo observado foi de 52.58 (classificação de obesidade mórbida). 
-
-Já o valor médio de IMC observado foi de 33.10 (classificação de obesidade grau 1), muito próximo da mediana.
-
-O desvio padrão do IMC é de 7.02.
-
-A seguir, a Figura 2 apresenta um boxplot e um histograma para uma melhor visualização dos dados:
-
-```{r, echo = F, fig.cap="\\label{fig:figs} Histograma e Boxplot do IMC dos pacientes"}
-
-par(mfrow = c(1,2))
-
-boxplot(bmi, main = "Boxplot - IMC dos pacientes", ylab = "IMC dos pacientes", col = "white")
-
-hist(bmi, ylab = "Frequência", xlab = "IMC dos pacientes",
-main = "Histograma - IMC dos pacientes")
-
-```
-
-## Preço do seguro saúde 
-
-Por fim, nos preços do seguro saúde, temos que o preço médio entre os 91 pacientes estudados foi de U\$34.845,00. Já os preços mínimo, mediano e máximo foram, respectivamente, U\$16.578,00, U\$37.484,00 e U\$63.770,00.
-
-O desvio padrão preços foi de R\$11.324,77.
-
-A seguir, a Figura 3 apresenta um boxplot e um histograma para uma melhor visualização dos dados:
-
-```{r, echo = F, fig.cap="\\label{fig:figs} Histograma e Boxplot dos preços do seguro saúde"}
-
-par(mfrow = c(1,2))
-
-boxplot(charges, main = "Boxplot - Preços do seguro", ylab = "Preço do seguro (em dólares)", col = "white")
-
-hist(charges, ylab = "Frequência", xlab = "Preço do seguro (em dólares)",
-main = "Histograma - Preços do seguro")
-
-```
-
-## Relação linear entre as variáveis
-
-Afim de investigar mais a fundo uma possível relação linear entre as variáveis idade de IMC e a variável de preço do seguro saúde, são apresentados dois diagramas de dispersão e seus respectivos coeficientes de correlação com intervalos de confiança e valor-p*.
-
-\* O teste de hipótese é realizado para verificar se o valor encontrado do coeficiente de correlação linear realmente é representativo da população de interesse. As hipóteses são:
-
-$$ \begin{cases} H_0: \text{verdadeira correlação entre as variáveis é zero} \\ H_1: \text{ verdadeira correlação entre as variáveis não é zero} \end{cases} $$
-Logo, procuramos valores-p que nos indiquem a rejeição da hipótese nula.
-
-A Figura 5 nos apresenta os três diagramas de dispersão para uma melhor visualização das variáveis de gasto com a variável de lucro.
-
-```{r, echo = F, fig.cap="\\label{fig:figs} Diagramas de Dispersão"}
-
-par(mfrow = c(1, 2))
-plot(age, charges, main = "Dispersão - Idade x Preço", xlab = "Idade do paciente (anos)", ylab = "Preço do seguro saúde (dólares)", pch = 20)
-plot(bmi, charges, main = "Dispersão - IMC x Preço", xlab = "IMC do paciente", ylab = "Preço do seguro saúde (dólares)", pch = 20)
-layout(1)
-
-```
-
-Assim, podemos observar que os diagramas de dispersão nos indicam que temos indicios de que existem relações lineares positivas tanto entre idade e preço, quanto entre IMC e preço.
-
-```{r, echo = F}
-
-a <- cor.test(age, charges)
-b <- cor.test(bmi, charges)
-
-conj <- c("Idade x Preço", "IMC x Preço")
-cor <- c(0.30, 0.79)
-conf <- c("(0.11; 0.48)", "(0.71; 0.86)")
-valorp <- c("0.003", "2.2e-16")
-
-corr <- rbind(cor, conf, valorp)
-rownames(corr) <- c("Correlação", "Intervalo de Confiança", "Valor-P")
-colnames(corr) <- conj
-
-```
-
-Os coeficientes de correlação linear, seus intervalos de confiança de 95% e os valores-p do teste de hipótese foram feitos ambos conjuntos. A Tabela 3 nos permite visualizar exatamente isso:
-
-```{r, echo = F}
-
-kable(corr, align = "c", caption = "Correlações entre as variáveis")
-
-```
-
-## Idade x Preço do seguro saúde
-
-Como é possível observar na Tabela 3, o coeficiente de correlação entre as variáives é de 0.3 o que indica uma relação linear positiva. O valor-p obtido no teste de hipóteses também confirma a nossa suspeita de que havia tal relação.
-
-## IMC x Preço do seguro saúde
-
-Como é possível observar na Tabela 3, o coeficiente de correlação entre as variáives é de 0.79 o que indica uma forte relação linear positiva. O valor-p obtido no teste de hipóteses também confirma a nossa suspeita de que havia tal relação.
-
-## Correlação linear entre as variáveis explicativas
-
-É importante um modelo de regressão linear múltipla que as variáveis explicativas não sejam correlacionadas. Logo, da mesma forma que feito anteriormente os testes de correlação foram feitos para as duas variáveis explicativas.
-
-Foi encontrado uma correlação de -0.062 entre as variáveis Idade e IMC, o que é exatamente o que procuramos, dado que é extremamente raro uma correlação exatamente igual a zero, ter uma correlação extremamente baixa é interessante nesse caso. 
-
-O teste de hipótese também apresentou os resultados esperados, obtendo um valor-p de 0.5594, que nos indica a não rejeitar $H_0 = \text{verdadeira correlação entre as variáveis é zero}$.
-
-O intervalo de confiança encontrado foi entre -0.26 e 0.14.
-
-```{r, echo = F}
-
-c <- cor.test(age, bmi)
-
-```
-
-
-# Modelo de Regressão Linear Múltipla
-
-Agora, com o objetivo de analisar o efeito das variáveis de idade e IMC ao mesmo tempo no preço do seguro saúde, um modelo de regressão linear múltipla foi ajustado.
-
-Os coeficientes estimados para o intercepto, $\hat \beta_1$, $\hat \beta_2$ e $\hat \beta_3$ podem ser vistos na Tabela 4:
-
-```{r, echo = F}
-
-modelo <- lm(charges ~ age + bmi)
-
-coeff <- matrix(c("Intercepto", "Beta 1", "Beta 2", round(modelo$coefficients[1], 2), round(modelo$coefficients[2], 2), round(modelo$coefficients[3], 2)), nrow = 3)
-
-kable(coeff, col.names = c("Coeficiente", "Valor Estimado"), align = "c",
-      caption = "Coeficientes estimados para o modelo de regressão linear múltipla") %>% 
-  kable_styling(latex_options = "HOLD_position")
-
-```
-
-Assim, o modelo de regressão ajustado tem como fórmula:
-
-$$ \widehat{Preço} = \hat \beta_0 + \hat \beta_1 \times \text{Idade} + \hat \beta_2 \times \text{IMC}$$
-$$ \widehat{Preço} = -20175.61 + 285.83 \times \text{Idade} + 1319.25 \times \text{IMC}$$
-A partir do modelo de regressão linear podemos as seguintes interpretações dos seus parâmetros estimados podem ser feitas:
-
-## Intercepto ($\hat \beta_0$)
-
-O intercepto é o valor previsto do preço médio do seguro saúde de um paciênte que tem idade zero e IMC = 0. 
-
-Entretanto, nesse caso, não faz sentido analisar o intercepto dessa maneira, já não existe uma pessoa com IMC = 0 e também não existe um preço negativo para seguro saúde, que no caso seria de -U\$20.175,71.
-
-## $\hat \beta_1$
-
-Já o $\hat \beta_1$, assumindo que $\hat \beta_2$ mantenha-se constante, o preço médio do seguro saúde irá aumentar em U\$285,80 para cada 1 ano de vida do paciente. 
-
-## $\hat \beta_2$
-
-Da mesma forma que anteriormente, para $\hat \beta_2$, assumindo que $\hat \beta_2$ mantenha-se constante, o preço médio do seguro aumentará em U\$1.319,25 para cada 1 unidade acrescida ao IMC do paciente.
-
-## Considerações gerais do modelo
-
-Desta forma, o modelo de regressão linear múltipla ajustado nos indica que os pacientes que pagarão mais caro pelo seguro saúde são os pacientes com maior idade e maior índice de massa corpórea.
-
-# Determinando a significância das variáveis ao nível de 5%
-
-Desejamos testar a significância de $X_j$ para $i = 0, 1, 2$ no modelo:
-
-$$ \begin{cases} H_0: \beta_j = 0 \\ H_1: \beta_j \ne 0 \end{cases} $$
-
-Assim, a estatística de teste é dada por:
-
-$$ t = \frac{\hat \beta_j - \beta_j}{ep(\hat \beta_j)} $$
-
-Sob a hipótese nula $t$ tem distribuição $t$-Student com $n-k = 88$ graus de liberdade. Desta forma, rejeitaremos a hipótese nula, ao nível de 5% de confiança, se
-
-$$ |t| > | t_{(88;0.025)} | $$
-Assim, os valores dos erros padrão para as três variáveis são apresentados na tabela abaixo:
-
-```{r, echo = F}
-
-std <- c(3407.24, 42.25, 84.70)
-betas <- c("Intercepto", "Idade", "IMC")
-
-erros <- cbind(betas, std)
-
-colnames(erros) <- c("Variáveis", "Erros Padrão")
-
-kable(erros, align = "c", caption = "Erros padrão") %>% 
-  kable_styling(latex_options = "HOLD_position")
-
-detach(dados)
-```
-
-## Testando $H_0: \beta_0 = 0$
-
-Encontrando a estatística $t$:
-
-$$ t_0 = \frac{-20175.61 - 0}{3407.24} = `r -20175.61/3407.24` $$
-Assim, 
-
-$$ |`r -20175.61/3407.24`| > | t_{(88;0.025)} | $$
-$$ `r 20175.61/3407.24` >  `r pt(q = 0.025, df = 88) ` $$
-Assim, rejeitamos a hipótese nula ao nível de significância de 5%.
-
-## Testando $H_0: \beta_1 = 0$
-
-Encontrando a estatística $t$:
-
-$$ t_0 = \frac{285.83 - 0}{42.25} = `r 285.83/42.25` $$
-Assim, 
-
-$$ |`r 285.83/42.25`| > | t_{(88;0.025)} | $$
-$$ `r 285.83/42.25` >  `r pt(q = 0.025, df = 88) ` $$
-Assim, rejeitamos a hipótese nula ao nível de significância de 5%.
-
-## Testando $H_0: \beta_2 = 0$
-
-Encontrando a estatística $t$:
-
-$$ t_0 = \frac{1319.25 - 0}{84.70} = `r 1319.25/84.70` $$
-Assim, 
-
-$$ |`r 1319.25/84.70`| > | t_{(88;0.025)} | $$
-$$ `r 1319.25/84.70` >  `r pt(q = 0.025, df = 88) ` $$
-Assim, rejeitamos a hipótese nula ao nível de significância de 5%.
-
-# Análise de diagnóstico do Modelo
-
-  Partindo para a análise de diagnóstico do nosso modelo de regressão linear múltipla ajustado, inicialmente tendo como procedimento comum a análise de resíduos em regressão linear simples, analisaremos os resíduos *jacknife* e os valores ajustados do modelo.
-
-```{r, echo = F,message=FALSE}
-library(MASS)
-library(tidyverse)
-modelo <- lm(dados$charges ~ dados$age + dados$bmi)
-
-#plot predictor variable vs. studentized residuals
-plot(modelo$fitted.values, studres(modelo),  ylab='Residuos Estudentizados', xlab='Valores Ajustados') 
-
-#add horizontal line at 0
-abline(0, 0)
-
-```
-
-  No gráfico não há um padrão claro entre os resícuos estudentizados, além disso os valores variam entre o intervalo de -2 à 2 estando bem distribuidos na média 0, é possível dizer que os resíduos são homocedasticos, no entanto há um ou mais possíveis *outliers*, ou valores passíveis de investigação que ultrapassaram o limite de -3 à 3 no eixo y. Partindo para a análise de normalidade dos resíduos no QQplot:
-
-```{r, echo = F,message=FALSE}
-#install.packages("car")
-library("car")
-qqPlot(studres(modelo))
-
-```
-
- Não há indicios de que os resíduos não sejam normais, no entanto há um ponto (ou mais) no gráfico que parece fugir a normalidade, ponto este que talvez seja um possível *outlier*, identificado previamente no gráfico de Resíduos Estudentizados e Valores Ajustados. Para a distância de Cook (utilizando os resíduos estudentizados) tivemos o seguinte gráfico:
-
-
-```{r, echo = F,message=FALSE}
-#install.packages("car")
-library("car")
-modelo$residuals <- studres(modelo)
-plot(modelo, which = 5)
-
-```
-
- A primeira vista o gráfico das distâncias de Cook, sugere que não há pontos influentes em relação a distância de Cook, no entanto também sugere que os pontos 85, 90 e 71 sejam investigados, referente ao ponto 90 já haviamos demonstrado preocupação em relação aos gráficos anteriores. Para os pontos de alavanca e resíduos estudentizados tivemos:
- 
-```{r, echo = F,message=FALSE}
-#install.packages("olsrr")
-library("olsrr")
-olsrr::ols_plot_resid_lev(modelo)
-
-
-```
- Mais especificamente no gráfico de pontos de alavanca e resíduos estudentizados temos inicialmente alguns pontos, que não parecem ser situações que não fossem plausíveis na vida real, como o 36 identificado como ponto discrepante, sendo este um indivíduo de 54 anos e IMC de 47,41, na tabela em (https://www.ricardogozzano.com.br/calculadora-imc/), essa classificação é de obesidade mórbida ou também conhecida como de grau 3, já o indivíduo classificado como ponto 34 tem 42 anos e teve um imc de 26,02 classificado como sobrepeso, o ponto 90 é um indivíduo de 45 anos classificado como obesidade de grau 1. Já o ponto 71 é realmente estranho, indica que tem um indivíduo em risco sério de saúde ou que foi registrada errôneamente, pois sua idade é de 22 anos e seu IMC de 52,58. Para os gráficos dos dfbeta tivemos:
- 
-```{r, echo = F,message=FALSE}
-#install.packages("olsrr")
-
-olsrr::ols_plot_dfbetas(modelo)
-
-
-```
-
-Há uma insistência em relação a aparição do ponto 90 como ponto  influente, no entanto não parece que há problemas com este ponto na base de dados, agora em relação ao ponto 71, houve insistência em sua aparição em todos os gráficos, é interessante que o ponto 81 identifica um indivíduo com 43 anos e obesidade mórbida, no entanto que não parece ser um ponto implausível como o ponto 71. Para o gráfico do dffits tivemos:
-
-```{r, echo = F,message=FALSE}
-#install.packages("olsrr")
-
-olsrr::ols_plot_dffits(modelo)
-
-```
-
- O DFFITS recomenda a investigação dos pontos 90 e 71, mas o ponto 90 realmente parece não ser anormal, para o ponto 71 é interessante saber o conhecimento prévio da área para referendar ou não sua exclusão. Para o gráfico do CovRatio tivemos:
- 
-```{r, echo = F,message=FALSE}
-#install.packages("olsrr")
-
-plot(covratio(modelo))
-
-covratio(modelo)[covratio(modelo)<1]
-
-```
- Com a observação 90 diminuindo a precisão das estimativas dos parâmetros, apesar de haver outras observações mas que estão muito próximas e até podem ser arredondadas para 1, a observação 90 de fato, parece não ser implausível, a menos que o problema esteja no valor em dólares cobrado em seu seguro saúde (USD 62.592,87) que parece estar super-faturado se comparado a observação 91 de um indivíduo de 42 anos e obesidade mórbida, para realizar análises em relação ao valor cobrado no plano de saúde destes clientes é interessante saber o motivo do valor cobrado e se realmente são plausíveis, cabe também investigar a observação 71 do indivíduo de 22 anos a quem foi cobrado USD 44.501 e teve um IMC>50 registrado. 
 
 # Apêndice
 
