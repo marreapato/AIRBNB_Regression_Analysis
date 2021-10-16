@@ -53,6 +53,110 @@ ggpairs(dados, lower = list(continuous = "smooth"))
 
 ```
 
+# Ajuste de Modelos Polinomiais
+
+  Os modelos foram construídos com o objetivo de prever o preço com base no tempo de construção do imóvel. O nível de significância assumido é de 5%, foram utilizados os resíduos estudentizados para a análise dos resíduos do modelo.
+
+### Modelo Q=2
+
+ O primeiro modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2$, testando os betas estimados do modelo todos estiveram com um P-valor<0,0001, sendo portanto os valores dos parâmetros diferentes de 0 a um nível de 5% de significância, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.40), o gráfico de normalidade
+
+```{r, echo = F, warning=F,message=FALSE,results='hide'}
+
+#################### regressao polinomial
+#regressao polinomial usual
+#q=2,3
+#Q=2
+fit <- lm(dados$preco~dados$tempo+ I(dados$tempo^2))
+summary(fit)
+
+plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
+lines(smooth.spline(dados$tempo,predict(fit)),col="red",lwd=1)
+
+fit$residuals <- studres(fit)
+plot(fit) 
+
+#dados <- dados[-c(338),]
+shapiro.test(fit$residuals)
+#perform Breusch-Pagan Test
+bptest(fit)
+
+```
+  
+
+
+### Modelo Q=3
+
+```{r, echo = F, warning=F,message=FALSE,results='hide'}
+
+
+#Q=3
+fit <- lm(dados$preco~dados$tempo+ I(dados$tempo^2)+ I(dados$tempo^3))
+summary(fit)
+plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
+lines(smooth.spline(dados$tempo,predict(fit)),col="red",lwd=1)
+
+fit$residuals <- studres(fit)
+plot(fit) 
+
+#dados <- dados[-c(338),]
+shapiro.test(fit$residuals)
+
+#perform Breusch-Pagan Test
+bptest(fit)
+
+
+```
+
+
+### Modelo Q=2 Ortogonal
+
+```{r, echo = F, warning=F,message=FALSE,results='hide'}
+
+
+#regressão polinomial ortogonal
+fit_ort <- lm(dados$preco~poly(dados$tempo,degree=2,raw=F))
+summary(fit_ort)
+
+plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
+lines(smooth.spline(dados$tempo,predict(fit_ort)),col="red",lwd=1)
+
+fit_ort$residuals <- studres(fit_ort)
+plot(fit_ort) 
+
+#dados <- dados[-c(338),]
+shapiro.test(fit_ort$residuals)
+
+#perform Breusch-Pagan Test
+bptest(fit_ort)
+
+
+```
+
+### Modelo Q=3 Ortogonal
+
+
+```{r, echo = F, warning=F,message=FALSE,results='hide'}
+
+
+#regressão polinomial ortogonal q=3
+fit_ort <- lm(dados$preco~poly(dados$tempo,degree=3,raw=F))
+summary(fit_ort)
+
+plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
+lines(smooth.spline(dados$tempo,predict(fit_ort)),col="red",lwd=1)
+
+fit_ort$residuals <- studres(fit_ort)
+plot(fit_ort) 
+
+
+#dados <- dados[-c(338),]
+shapiro.test(fit_ort$residuals)
+
+#perform Breusch-Pagan Test
+bptest(fit_ort)
+
+```
 # Apêndice
 
 ```{r ref.label=knitr::all_labels(), echo = T, eval = F}
