@@ -16,9 +16,21 @@ library(GGally)
 library(MASS)
 #install.packages("lmtest")
 library(lmtest)
-#preço e tempo de construção da casa
-dados <- read.csv("lab8.csv")
+#install.packages("ggthemes")
+library(ggthemes)
+dados <- read.csv("lab09.csv")
 
+dados$categorias <- "0"
+dados$categorias[dados$age>=60&dados$bmi<22] <- "Magreza"
+dados$categorias[dados$age<=59&dados$bmi<=18.5] <- "Magreza"
+
+dados$categorias[dados$age>=60&(dados$bmi<=27&dados$bmi>=22)] <- "Eutrofia"
+dados$categorias[dados$age<=59&(dados$bmi>18.5&dados$bmi<=24.9)] <- "Eutrofia"
+
+dados$categorias[dados$age>=60&dados$bmi>27] <- "Sobrepeso/Obesidade"
+dados$categorias[dados$age<=59&dados$bmi>24.9] <- "Sobrepeso/Obesidade"
+
+dados$categorias <- as.factor(dados$categorias)
 
 
 ```
@@ -27,146 +39,56 @@ dados <- read.csv("lab8.csv")
 
 # Introdução
 
-  Temos dados de diversos imóveis, juntamente com algumas informações referentes ao metro, preço, quantidade de lojas e o tempo de construção do imóvel. Como o ajuste linear do modelo não foi adequado, partimos para um ajuste polinomial.
+  Temos dados de diversos pacientes de um Seguro Saúde Americano, onde na base de dados, estão contempladas as seguintes variáveis: charges: preço do seguro saúde, em dólares; age: idade do paciente, em anos completos; bmi: IMC do paciente; sex : sexo do paciente; children: número de filhos que o paciente tem; smoker : se o paciente é fumante; region: região de residência do paciente. 
 
 # Análise Descritiva e Exploratória
 
- O preço médio foi de 38,58 USD, além disso em média os imóveis tem 916,93 metros, em média 4 lojas estão ao redor dos imóveis, sendo que 75% dos imóveis tem até 6 lojas em seus arredores, o tempo médio de construção dos imóveis é de 17,92. Na matrix de correlação abaixo, a maior correlação positiva está entre a loja e o preço. As maiores correlações negativas estão entre o metro do imóvel e o número de lojas e entre o preço e o metro, a correlação entre o preço e o tempo de construção do imóvel é levemente negativa.
+
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
-summary(dados)
+canal_participacao <- dados %>% group_by(categorias) %>% summarise(valor_media=mean(charges))
 
-cor(dados)
-dados <- dados[,-1]
-
-corrplot(cor(dados), type = "upper", order = "hclust", 
-         tl.col = "black", tl.srt = 45)
-
-```
-
- Para melhor visualizar as correlações, no gráfico abaixo, tempos as correlações entre o preço e o tempo (-0.18), onde seu gráfico de dispersão se assemelha muito a uma parábola, o preço e a quantidade de lojas tem uma correlação moderadamente alta (0,58), a quantidade de lojas e o metro do imóvel apresentam uma correlação negativa (-0,593), onde, surpreendentemente, quanto maior o metro do imóvel, menor será o número de lojas.
-
-```{r, echo = F, warning=F,message=FALSE,results='hide'}
-
-ggpairs(dados, lower = list(continuous = "smooth"))
-
-```
-
-# Ajuste de Modelos Polinomiais
-
-  Os modelos foram construídos com o objetivo de prever o preço com base no tempo de construção do imóvel. O nível de significância assumido é de 5%, foram utilizados os resíduos estudentizados para a análise dos resíduos do modelo.
-
-### Modelo Q=2
-
- O primeiro modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2$, testando os betas estimados do modelo todos estiveram com um P-valor<0,0001, sendo portanto os valores dos parâmetros diferentes de 0 a um nível de 5% de significância, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.40), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de Cook, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
-
-```{r, echo = F, warning=F,message=FALSE,results='hide'}
-
-#################### regressao polinomial
-#regressao polinomial usual
-#q=2,3
-#Q=2
-fit <- lm(dados$preco~dados$tempo+ I(dados$tempo^2))
-summary(fit)
-
-plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
-lines(smooth.spline(dados$tempo,predict(fit)),col="red",lwd=1)
-
-fit$residuals <- studres(fit)
-plot(fit) 
-
-#dados <- dados[-c(338),]
-shapiro.test(fit$residuals)
-#perform Breusch-Pagan Test
-bptest(fit)
-
-```
-  
+canal_participacao$real <- paste(round(canal_participacao$valor_media),"USD")
 
 
-### Modelo Q=3
+ggplot(aes(x = reorder(canal_participacao$categorias,-canal_participacao$valor_media), y = canal_participacao$valor_media,fill=canal_participacao$categorias), data = canal_participacao) + geom_bar(stat = "identity",position =position_dodge())+theme_fivethirtyeight()+
+  theme()+scale_fill_tableau()+theme(legend.position = "none")+
+  labs(title="Valor médio do Seguro-Saúde.",subtitle = "Por Categoria do IMC")+geom_text(aes(label = canal_participacao$real),
+                                                                                                                                                                                      position = position_dodge(width = 1),
+                                                                                                                                                                                      vjust = -0.2, size = 4, colour = "DarkGreen")
 
- O segundo modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2+\beta_3(Tempo_i)^3$, testando os betas estimados do modelo quase todos estiveram com um $P-valor\leq0,01$, exceto pelo $\beta_3$ que foi de 0,62, sendo portanto os valores dos parâmetros $\beta_1$ e $\beta_2$ diferentes de 0 a um nível de 5% de significância, já o $\beta_3$ sendo 0, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Similar ao ajuste anterior, os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.50), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de Cook, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
-
-```{r, echo = F, warning=F,message=FALSE,results='hide'}
-
-
-#Q=3
-fit <- lm(dados$preco~dados$tempo+ I(dados$tempo^2)+ I(dados$tempo^3))
-summary(fit)
-plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
-lines(smooth.spline(dados$tempo,predict(fit)),col="red",lwd=1)
-
-fit$residuals <- studres(fit)
-plot(fit) 
-
-#dados <- dados[-c(338),]
-shapiro.test(fit$residuals)
-
-#perform Breusch-Pagan Test
-bptest(fit)
 
 
 ```
 
 
-### Modelo Q=2 Ortogonal
-
- O terceiro modelo polinomial, foi o modelo de ordem polinomial 2, $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2$, no entanto consideranto os polinômios ortogonais, testando os betas estimados do modelo todos estiveram com um $P-valor\leq0,0001$, sendo portanto os valores dos parâmetros $\beta_1$ e $\beta_2$ diferentes de 0 a um nível de 5% de significância, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Similar ao ajuste anterior, os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0,40), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de *Cook*, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
-
-```{r, echo = F, warning=F,message=FALSE,results='hide'}
-
-
-#regressão polinomial ortogonal
-fit_ort <- lm(dados$preco~poly(dados$tempo,degree=2,raw=F))
-summary(fit_ort)
-
-plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
-lines(smooth.spline(dados$tempo,predict(fit_ort)),col="red",lwd=1)
-
-fit_ort$residuals <- studres(fit_ort)
-plot(fit_ort) 
-
-#dados <- dados[-c(338),]
-shapiro.test(fit_ort$residuals)
-
-#perform Breusch-Pagan Test
-bptest(fit_ort)
-
-
-```
-
-### Modelo Q=3 Ortogonal
-
- O quarto modelo polinomial, foi de forma $Preço_i=\beta_0+\beta_1(Tempo_i)+\beta_2(Tempo_i)^2+\beta_3(Tempo_i)^3$, no entanto considerando os polinômios ortogonais, testando os betas estimados do modelo quase todos estiveram com um $P-valor\leq0,01$, exceto pelo $\beta_3$ que foi de 0,62, sendo portanto os valores dos parâmetros $\beta_1$ e $\beta_2$ diferentes de 0 a um nível de 5% de significância, já o $\beta_3$ sendo 0, o ajuste da linha de regressão traça bem uma parábola sobre os pontos do gráfico de dispersão. Similar ao ajuste anterior, os resíduos aparentemente são homocedasticos, no entanto como na ponta direita do gráfico de resíduos X valores ajustados aparentemente há um padrão, fizemos um teste de Breusch-Pagan para verificar a homocedasticidade dos resíduos, onde não rejeitamos a hipótese de igualdade das variâncias (p-valor>0.50), o gráfico de normalidade mostra a identificação de alguns valores discrepantes, mas que não parecem ser anormais apenas pelo fato de não ter nenhum fator muito estranho associado além disso nenhum destes valores passa pela distância de Cook, o gráfico de normalidade mostra a fuga de diversos pontos e o teste de Shapiro Wilk indica para a rejeição do princípio de normalidade dos resíduos.
 
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
-
-#regressão polinomial ortogonal q=3
-fit_ort <- lm(dados$preco~poly(dados$tempo,degree=3,raw=F))
-summary(fit_ort)
-
-plot(dados$tempo,dados$preco,main="Ajuste do Modelo")
-lines(smooth.spline(dados$tempo,predict(fit_ort)),col="red",lwd=1)
-
-fit_ort$residuals <- studres(fit_ort)
-plot(fit_ort) 
-
-
-#dados <- dados[-c(338),]
-shapiro.test(fit_ort$residuals)
-
-#perform Breusch-Pagan Test
-bptest(fit_ort)
+ggplot(dados,aes(y=dados$charges,x=dados$categorias,fill=dados$categorias))+geom_boxplot()+theme_fivethirtyeight()+scale_fill_fivethirtyeight()+labs(title="Valor Pago por categoria do IMC")+
+  stat_summary(fun=mean, colour="darkred", geom="point", 
+               shape=18, size=3, show.legend=FALSE) +theme(legend.position = "none")
 
 ```
 
-### Informação geral referente aos modelos
 
-Os quatro modelos ajustados apresentaram $R^2$ múltiplos de 0.28, e $R^2$ ajustados de 0,27, a comparação de modelos será realizada a seguir utilizando o príncipio do resíduo condicional.
+```{r, echo = F, warning=F,message=FALSE,results='hide'}
+
+require(plyr)
+func <- function(dados)
+{
+  return(data.frame(COR = cor(dados$bmi, dados$charges)))
+}
+
+ddply(dados, .(dados$categorias), func)
+
+ggplot(dados,aes(x=dados$bmi,y=dados$charges,color=dados$categorias,fill=dados$categorias))+geom_point()+stat_smooth(se=F,method = "lm",color="red")+
+  theme_few()+labs(x="IMC",y="Valor do Seguro",color="Categoria",fill="Categorias")
+
+
+```
 
 # Apêndice
 
