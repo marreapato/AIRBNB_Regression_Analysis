@@ -43,6 +43,7 @@ dados$categorias <- as.factor(dados$categorias)
 
 # Análise Descritiva e Exploratória
 
+Como esperado o maior valor-médio é pago pelos pacientes que estão na categoria de Obesidade e/ou Sobrepeso (13,859 USD), enquanto o menor valor médio é pago pelos que foram categorizados como magreza (9,479 USD) devido a seu IMC **(Figura 1)**. No entanto em **(Figura 2)**, as medianas de cada uma das categorias estão próximas, a grande quantidade de valores atípicos é reponsável por deslocar a média dos valores totais pagos pelos clientes categorizados em obesidade e/ou sobrepeso (o valor médio corresponde ao ponto vermelho no boxplot).
 
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
@@ -61,7 +62,7 @@ ggplot(aes(x = reorder(canal_participacao$categorias,-canal_participacao$valor_m
 
 
 ```
-
+**Figura 1 - **Gráfico de Barras do valor por categoria do cliente.
 
 
 
@@ -72,7 +73,9 @@ ggplot(dados,aes(y=dados$charges,x=dados$categorias,fill=dados$categorias))+geom
                shape=18, size=3, show.legend=FALSE) +theme(legend.position = "none")
 
 ```
+**Figura 2 - **Boxplot do valor por categoria do cliente.
 
+ No gráfico de dispersão há realmente a formação de 3 diferentes grupos
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
