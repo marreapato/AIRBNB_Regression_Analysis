@@ -75,7 +75,7 @@ ggplot(dados,aes(y=dados$charges,x=dados$categorias,fill=dados$categorias))+geom
 ```
 **Figura 2 - **Boxplot do valor por categoria do cliente.
 
- No gráfico de dispersão há realmente a formação de 3 diferentes grupos
+ No gráfico de dispersão **(Figura 3)** há a formação de 3 diferentes grupos, ressaltando a boa qualidade da segmentação categórica e mostrando que grande parte dos valores da categoria sobrepeso/obesidade paga pelos maiores valores em USD por seguro-saúde.
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
@@ -92,6 +92,7 @@ ggplot(dados,aes(x=dados$bmi,y=dados$charges,color=dados$categorias,fill=dados$c
 
 
 ```
+**Figura 3 - **Gráfico de dispersão do valor por categoria do cliente.
 
 # Apêndice
 
