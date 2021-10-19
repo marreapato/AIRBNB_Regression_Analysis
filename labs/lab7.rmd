@@ -79,18 +79,8 @@ ggplot(dados,aes(y=dados$charges,x=dados$categorias,fill=dados$categorias))+geom
 
 ```{r, echo = F, warning=F,message=FALSE,results='hide'}
 
-require(plyr)
-func <- function(dados)
-{
-  return(data.frame(COR = cor(dados$bmi, dados$charges)))
-}
-
-ddply(dados, .(dados$categorias), func)
-
 ggplot(dados,aes(x=dados$bmi,y=dados$charges,color=dados$categorias,fill=dados$categorias))+geom_point()+stat_smooth(se=F,method = "lm",color="red")+
   theme_few()+labs(x="IMC",y="Valor do Seguro",color="Categoria",fill="Categorias")
-
-
 ```
 **Figura 3 - **Gráfico de dispersão do valor por categoria do cliente.
 
