@@ -76,47 +76,34 @@ ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label
 ```
 **Gráfico 2 - Informações referentes a qualidade do imóvel.**
 
+# Metodologia
+
+  A fim de escolher as variáveis a compor os modelos a serem ajustados, realizamos inicialmente uma avaliação das possíveis associações entre todas as variáveis presentes em nosso conjunto de dados entre si. Estas relações podem ser observadas na matriz de correlação abaixo, em que a cor azul indica uma correlação positiva e a cor vermelha uma correlação negativa. Além disso, quanto maior o tamanho do círculo e maior a intensidade da cor, mais forte é a correlação entre as variáveis. 
+
+# Resultados
+
+## Relação entre as variáveis
+
+Todas estas relações podem ser observadas na matriz de correlação abaixo:
+
+```{r echo=FALSE,warning=FALSE,message=FALSE,fig.show="hold",results='hide'}
+# Dispersão
+
+library(corrplot)
+par(mfrow=c(1,1))
+
+## Matriz de correlação
+dados_quant = dados[,-c(1,2,9,15,16,17,18,19,22)]
+
+M <- cor(dados_quant)
+corrplot(M, method = "circle")
+
+```
+**Gráfico 3 - Matriz de correlação entre todas as variáveis.**
+
+A partir da visualização da matriz de correlação, escolhemos as seguintes variáveis para avaliarmos seus gráficos de dispersão e valores dos coeficientes e correlação: **Price**, **Bathrooms**, **Sqft_living**, **Grade**, **Sqft_above**, **Sqft_living_15**.
 
 # Anexo
 
-```
-#install.packages("tidyverse")
-#install.packages("ggthemes")
-library(tidyverse)
-library(ggthemes)
-dados <- read.csv("kc_house_data.csv")
-
-summary(dados)
-mean(dados$bedrooms)
-mean(dados$bathrooms)
-
-hist(dados$bathrooms)
-hist(dados$bedrooms)
-hist(dados$sqft_basement)
-hist(dados$sqft_living)
-hist(dados$sqft_above)
-hist(dados$grade)
-
-ggplot(dados,aes(x=dados$bedrooms))+geom_histogram()+theme_economist_white()+labs(title="Vista para lagos ou rios")+scale_fill_continuous_tableau()+theme(legend.position = "none")+stat_bin(bins = 20) 
-
-ggplot(dados,aes(y=dados$bedrooms,x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_boxplot()+theme_fivethirtyeight()+labs(title="Vista para lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
-
-#analisar outliers
-
-ggplot(dados,aes(x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_bar()+theme_fivethirtyeight()+labs(title="Vista para mar, lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
-
-dados$grade_label <- NA
-
-dados$grade_label[dados$grade<=3] <- "Baixa"
-dados$grade_label[dados$grade>3&dados$grade<=10] <- "Média"
-dados$grade_label[dados$grade>=11] <- "Alta"
-
-
-
-ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label)))+geom_bar()+theme_fivethirtyeight()+labs(title="Avaliação da qualidade do imóvel")+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
-
-cor(dados[,3:14])
-
-
-
+```{r ref.label=knitr::all_labels(), echo = T, eval = F}
 ```
