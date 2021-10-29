@@ -1,0 +1,116 @@
+---
+title: "Marketing and Sales Data - Relatório"
+author: "João Vitor, Júnia Ortiz e Lucas Rabelo"
+date: "21/09/2021"
+output: pdf_document
+---
+
+```{r, include=FALSE}
+
+#install.packages("tidyverse")
+#install.packages("ggthemes")
+library(tidyverse)
+library(ggthemes)
+library(MASS)
+library(lmtest)
+dados <- read.csv("Dummy Data HSS.csv")
+options(scipen = 999)
+```
+
+# Introdução
+
+  A base de dados contêm informações de orçamentos para serem investidos em diferentes meios de comunicação, consta também na base a informação referente ao tipo de *influencer* que colaborará com a campanha de *marketing* nos diferentes meios e a quantidade de vendas realizadas atrelada as diferentes campanhas de *marketing*. 
+
+## Marketing and Sales Data
+
+  Algumas das informações que constam na base de dados são:
+
+ - **TV**: Orçamento do investimento em TV. (Em milhões)
+ - **Social Media**: Orçamento do investimento em Mídias Sociais. (Em milhões)
+ - **Radio**: Orçamento do investimento em Rádio. (Em milhões)
+ - **Influencer**: O tipo de influencer que colabora com a campanha (Nano Influencer, Mega Influencer, Macro Influencer e Micro Influencer)
+ - **Sales**: Vendas. (Em milhões)
+
+ Um influenciador digital, se destaca justamente por causa de sua presença na internet e nas redes sociais, os diferentes tipos de *influencers*$^1$ podem ser descritos como: 
+ 
+ - Mega Influencers: Geralmente eles têm, pelo menos, 1 milhão de seguidores ou assinantes em, pelo menos, uma plataforma de mídia social;
+ 
+ - Macro Influencers: Têm de 100 mil a 1 milhão de seguidores, eles se encontram entre os micro e os megainfluenciadores e geralmente têm um público grande e engajado;
+
+ - Micro Influencers: Os microinfluenciadores têm entre 10 mil e 100 mil seguidores, eles custam muito menos do que os macro e megainfluenciadores;
+ 
+- Nano Influencers: São um novo tipo de influenciador, que são consumidores comuns e influenciam dentro da comunidade local. Eles geralmente possuem menos de 10 mil seguidores nas redes sociais e pouca ou nenhuma experiência em trabalhar com marcas;
+
+### Análise Descritiva
+ 
+# Metodologia
+
+# Resultados
+
+## Modelo com o método Forward
+
+  O modelo com o método *Forward* foi de forma $Sales_i=-0,10+3,56*TV_i-0,004*Radio_i+0,004*Social.Media_i+0,01*InfluencerMega_i-0,05*InfluencerMicro-0,07*InfluencerNano_i$
+
+### Análise de Diagnóstico - Forward
+
+
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+dados_reg_semcat <- na.omit(dados)
+dados_reg_semcat$Influencer <- as.factor(dados_reg_semcat$Influencer)
+
+modelo <- step(lm(dados_reg_semcat$Sales~.,data=dados_reg_semcat),direction="forward")
+modelo$coefficients
+
+summary(modelo)
+anova(modelo)
+
+modelo$residuals <- studres(modelo)
+
+plot(modelo)
+
+shapiro.test(modelo$residuals)
+bptest(modelo)
+```
+
+
+# Modelo com o método Backward/Stepwise
+
+  O modelo com o método *Backward* coincidiu com o ajustado no método *Stepwise* e foi de forma $Sales_i=-0,13+3,56*TV_i$.
+  
+
+### Análise de diagnóstico - Backward/Stepwise
+
+
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+dados_reg_semcat <- na.omit(dados)
+dados_reg_semcat$Influencer <- as.factor(dados_reg_semcat$Influencer)
+
+modelo <- step(lm(dados_reg_semcat$Sales~.,data=dados_reg_semcat),direction="backward")
+modelo$coefficients
+
+summary(modelo)
+anova(modelo)
+
+modelo$residuals <- studres(modelo)
+plot(modelo)
+
+shapiro.test(modelo$residuals)
+bptest(modelo)
+```
+
+# Conclusão
+
+# Referências
+
+[1] - Base de dados. https://www.kaggle.com/harrimansaragih/dummy-advertising-and-sales-data
+
+[2] -  Diferença entre tipos de Influencers: https://flaviomuniz.com.br/qual-a-diferenca-entre-mega-macro-micro-nanoinfluencers-e-celebridades/
+
+[3] - Método Stepwise no R. https://rpubs.com/bigcat/258879
+
+# Anexo
+
+```{r ref.label=knitr::all_labels(), echo = T, eval = F}
+```
