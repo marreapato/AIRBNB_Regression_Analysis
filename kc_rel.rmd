@@ -79,12 +79,8 @@ ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label
 # Metodologia
 
   A fim de escolher as variáveis a compor os modelos a serem ajustados, realizamos inicialmente uma avaliação das possíveis associações entre todas as variáveis presentes em nosso conjunto de dados entre si. Estas relações podem ser observadas na matriz de correlação abaixo, em que a cor azul indica uma correlação positiva e a cor vermelha uma correlação negativa. Além disso, quanto maior o tamanho do círculo e maior a intensidade da cor, mais forte é a correlação entre as variáveis. 
-
-# Resultados
-
-## Relação entre as variáveis
-
-Todas estas relações podem ser observadas na matriz de correlação abaixo:
+  
+  Inicialmente dado o objetivo de nossa análise, primeiramente partimos para a realiza;'ao de modelos lineares simples, onde selecionamos a variável **Price** (preço do imóvel) e a variável **Grade** (nota atribuída à construção e design do imóvel) como variáveis respostas, tomando a variável **Sqft_living** (medida da parte interior do apartamento) como explicativa em ambos os casos. Para os dois pares de variáveis os seguintes coeficientes de correlação foram observados: 0.702 (**Price vs. Sqft_living**) e 0.763 (**Grade vs. Sqft_living**). Apesar de aplicarmos transformações como a *Box-Cox* nenhum dos modelos demonstrou um ajuste satisfatório. Com base na matriz de correlação abaixo, onde as correlações entre todas as variáveis está disponível:
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE,fig.show="hold",results='hide'}
 # Dispersão
@@ -101,7 +97,69 @@ corrplot(M, method = "circle")
 ```
 **Gráfico 3 - Matriz de correlação entre todas as variáveis.**
 
-A partir da visualização da matriz de correlação, escolhemos as seguintes variáveis para avaliarmos seus gráficos de dispersão e valores dos coeficientes e correlação: **Price**, **Bathrooms**, **Sqft_living**, **Grade**, **Sqft_above**, **Sqft_living_15**.
+A partir da visualização da matriz de correlação, escolhemos a  variável **Price** para avaliarmos seus gráficos de dispersão e valores dos coeficientes e correlação, devido a sua alta dependência com diversas das possíveis variáveis explicativas de nosso modelo.
+
+# Resultados
+
+Foi utilizado o método stepwise
+
+```{r echo=FALSE,warning=FALSE,message=FALSE,fig.show="hold",results='hide'}
+#remoção de outlier
+
+library(MASS)
+library(lmtest)
+
+#modelo sem variáveis categoricas
+dados <- dados[dados$bedrooms!=33,]
+
+dados_reg <- dados[,-c(1,2,15,16,17,18,19,22)]
+dados_reg$waterfront <- as.factor(dados_reg$waterfront)
+dados_reg$view <- as.factor(dados_reg$view)
+dados_reg$condition <- as.factor(dados_reg$condition)
+dados_reg$grade <- as.factor(dados_reg$grade)
+
+dados_reg_semcat <- dados_reg[,-c(7:10)]
+
+modelo <- step(lm(dados_reg_semcat$price~.,data=dados_reg_semcat),direction="both")
+modelo$coefficients
+
+summary(modelo)
+anova(modelo)
+
+modelo$residuals <- studres(modelo)
+plot(modelo)
+
+
+
+```
+
+modelo 2
+
+```{r echo=FALSE,warning=FALSE,message=FALSE,fig.show="hold",results='hide'}
+
+
+modelo <- step(lm(dados_reg$price~.,data=dados),direction="both")
+modelo$coefficients
+
+summary(modelo)
+anova(modelo)
+
+modelo$residuals <- studres(modelo)
+plot(modelo)
+
+shapiro.test(modelo$residuals)
+bptest(modelo)
+
+
+```
+
+# Referências
+
+[1] - Base de dados. https://www.kaggle.com/harlfoxem/housesalesprediction
+
+[2] -  Explicação das Variáveis. https://rstudio-pubs-static.s3.amazonaws.com/155304_cc51f448116744069664b35e7762999f.html
+
+[3] - Método Stepwise no R. https://rpubs.com/bigcat/258879
 
 # Anexo
 
