@@ -19,7 +19,7 @@ options(scipen = 999)
 
 # Introdução
 
-  A base de dados contêm informações de orçamentos para serem investidos em diferentes meios de comunicação, consta também na base a informação referente ao tipo de *influencer* que colaborará com a campanha de *marketing* nos diferentes meios e a quantidade de vendas realizadas atrelada as diferentes campanhas de *marketing*. 
+  A base de dados$^1$ contêm informações de orçamentos para serem investidos em diferentes meios de comunicação, consta também na base a informação referente ao tipo de *influencer* que colaborará com a campanha de *marketing* nos diferentes meios e a quantidade de vendas realizadas atrelada as diferentes campanhas de *marketing*. 
 
 ## Marketing and Sales Data
 
@@ -31,7 +31,7 @@ options(scipen = 999)
  - **Influencer**: O tipo de influencer que colabora com a campanha (Nano Influencer, Mega Influencer, Macro Influencer e Micro Influencer)
  - **Sales**: Vendas. (Em milhões)
 
- Um influenciador digital, se destaca justamente por causa de sua presença na internet e nas redes sociais, os diferentes tipos de *influencers*$^1$ podem ser descritos como: 
+ Um influenciador digital, se destaca justamente por causa de sua presença na internet e nas redes sociais, os diferentes tipos de *influencers*$^2$ podem ser descritos como: 
  
  - Mega Influencers: Geralmente eles têm, pelo menos, 1 milhão de seguidores ou assinantes em, pelo menos, uma plataforma de mídia social;
  
@@ -41,7 +41,7 @@ options(scipen = 999)
  
 - Nano Influencers: São um novo tipo de influenciador, que são consumidores comuns e influenciam dentro da comunidade local. Eles geralmente possuem menos de 10 mil seguidores nas redes sociais e pouca ou nenhuma experiência em trabalhar com marcas;
 
-### Análise Descritiva
+## Análise Descritiva
  
 # Metodologia
 
@@ -49,11 +49,9 @@ options(scipen = 999)
 
 ## Modelo com o método Forward
 
-  O modelo com o método *Forward* foi de forma $Sales_i=-0,10+3,56*TV_i-0,004*Radio_i+0,004*Social.Media_i+0,01*InfluencerMega_i-0,05*InfluencerMicro-0,07*InfluencerNano_i$
+  O modelo com o método *Forward* foi de forma $Sales_i=-0,10+3,56\cdot TV_i-0,004\cdot Radio_i+0,004\cdot Social.Media_i+0,01\cdot InfluencerMega_i-0,05\cdot InfluencerMicro-0,07\cdot InfluencerNano_i$, ou seja caso o investimento em TV seja de 1 milhão de unidades monetárias (U.M.), não seja feito investimento em rádio, e o investimento em mídias sociais seja de 100 milhões com a colaboração de um Mega Influencer espera-se que em média o valor das vendas seja de 7,47 milhões U.M., para todos os outros tipos de influencers há de se esperar que haja um efeito negativo sobre o número de vendas, sendo melhor investir no Mega Influencer. Além disso um efeito negativo sobre as vendas ocorre ao se investir em propagandas no rádio, sendo interessante evitar este meio de divulgação e focar em outros que possam trazer mais retorno.
 
 ### Análise de Diagnóstico - Forward
-
-
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
 dados_reg_semcat <- na.omit(dados)
@@ -76,7 +74,7 @@ bptest(modelo)
 
 # Modelo com o método Backward/Stepwise
 
-  O modelo com o método *Backward* coincidiu com o ajustado no método *Stepwise* e foi de forma $Sales_i=-0,13+3,56*TV_i$.
+  O modelo com o método *Backward* coincidiu com o ajustado no método *Stepwise* e foi de forma $Sales_i=-0,13+3,56\cdot TV_i$. Portanto caso sejam investidos 1 milhão de U.M. no meio de comunicação da TV, há de se esperar que em média 3,43 milhões de U.M. seja o valor das vendas.
   
 
 ### Análise de diagnóstico - Backward/Stepwise
@@ -104,11 +102,10 @@ bptest(modelo)
 
 # Referências
 
-[1] - Base de dados. https://www.kaggle.com/harrimansaragih/dummy-advertising-and-sales-data
+[1] - Saragih, H. S. Dummy Marketing and Sales Data. Data of TV, Influencer, Radio, and Social Media Ads budget to predict Sales. Postado em 11/03/2021. Último Acesso: 29/10/2021. Acesso Em: https://www.kaggle.com/harrimansaragih/dummy-advertising-and-sales-data
 
-[2] -  Diferença entre tipos de Influencers: https://flaviomuniz.com.br/qual-a-diferenca-entre-mega-macro-micro-nanoinfluencers-e-celebridades/
+[2] -  Muniz, Flávio. QUAL A DIFERENÇA ENTRE MEGA, MACRO, MICRO, NANOINFLUENCERS E CELEBRIDADES? Postado em 10/11/2019. Último Acesso: 29/10/2021 Acesso Em: https://flaviomuniz.com.br/qual-a-diferenca-entre-mega-macro-micro-nanoinfluencers-e-celebridades/
 
-[3] - Método Stepwise no R. https://rpubs.com/bigcat/258879
 
 # Anexo
 
