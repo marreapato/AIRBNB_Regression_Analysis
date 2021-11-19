@@ -1,9 +1,10 @@
 ---
 title: "Marketing and Sales Data - Relatório"
 author: "João Vitor, Júnia Ortiz e Lucas Rabelo"
-date: "21/09/2021"
+date: "31/10/2021"
 output: pdf_document
 ---
+\renewcommand{\tablename}{Tabela}
 
 ```{r, include=FALSE}
 
@@ -23,7 +24,7 @@ options(scipen = 999)
 
 ## Marketing and Sales Data
 
-  Algumas das informações que constam na base de dados são:
+  As variáveis que constam na base de dados são:
 
  - **TV**: Orçamento do investimento em TV. (Em milhões)
  - **Social Media**: Orçamento do investimento em Mídias Sociais. (Em milhões)
@@ -39,17 +40,200 @@ options(scipen = 999)
 
  - Micro Influencers: Os microinfluenciadores têm entre 10 mil e 100 mil seguidores, eles custam muito menos do que os macro e megainfluenciadores;
  
-- Nano Influencers: São um novo tipo de influenciador, que são consumidores comuns e influenciam dentro da comunidade local. Eles geralmente possuem menos de 10 mil seguidores nas redes sociais e pouca ou nenhuma experiência em trabalhar com marcas;
+- Nano Influencers: São um novo tipo de influenciador, que são consumidores comuns e influenciam dentro da comunidade local. Eles geralmente possuem menos de 10 mil seguidores nas redes sociais e pouca ou nenhuma experiência em trabalhar com marcas.
 
-## Análise Descritiva
- 
 # Metodologia
+
+Com objetivo de avaliar o modo como as decisões de orçamento utilizados em campanhas de marketing impactam o volume de vendas, propomos a construção de um modelo avaliando a relação entre as variáveis presentes em nosso conjunto de dados, considerando a variável  **Sales** como variável resposta e as variáveis **TV**, **Social Media**, **Radio**, **Influencer**.
+
+Para tanto, este trabalho consistiu nas seguintes etapas:
+
+ - Coleta dos dados;
+ - Análise descritiva;
+ - Avaliação de modelos de regressão linear simples;
+ - Avaliação de modelos de regressão linear múltipla;
+ - Seleção e proposição do melhor modelo encontrado.
 
 # Resultados
 
+## Análise Descritiva
+
+Verificamos inicialmente as medidas descritivas de cada uma das variáveis em estudo, sendo cinco variáveis no total (quatro quantitativas e uma qualitativa). O resumo das medidas das variáveis pode ser encontrado na tabela abaixo.Todos os valores estão apresentados em milhões de dólares.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.show="hold", results='show'}
+
+# Medidas descritivas
+
+# Organizando os dados
+dados <- na.omit(dados)
+dados$Influencer = as.factor(dados$Influencer)
+
+tabela1 = dados %>% summary(columns = 2:5)
+
+knitr::kable(tabela1, align = "c", caption = "Medidas descritivas das variáveis")
+
+```
+
+Além disso, construímos os histogramas abaixo, a fim de auxiliar a visualização da distribuição dos dados das variáveis quantitativas.
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+
+# Histogramas
+plot5 = ggplot(dados, aes(x = TV)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("TV") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
+
+plot6 = ggplot(dados, aes(x = Radio)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("Radio") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
+
+plot7 = ggplot(dados, aes(x = Social.Media)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("Mídias Sociais") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
+
+plot8 = ggplot(dados, aes(x = Sales)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("Vendas") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
+
+par(mfrow=c(1,4))
+plot5
+plot6
+plot7
+plot8
+
+```
+
+### Figura 1 - Histogramas das variáveis quantitativas.
+
+Conforme é possível perceber das medidas descritivas, bem como dos histogramas construídos, os maiores investimentos são observados para TV, com média de 54.06 milhões de dólares e mediana de 53.00 milhões de dólares, sendo o valor mínino de 10.00 milhões e o máximo chegando a 100.00 milhões de dólares. Já os menores investimentos são observados para as mídias sociais, com média de 3.32 milhões de dólares e mediana de 3.06 milhões de dólares, valor mínimo de 1.53 milhões e máximo de 13.98 milhões de dólares. O volume de vendas varia de 31.20 a 364.10 milhões de dólares, tendo a maior parte dos valores concentrada entre 100.00 e 300.00 milhões de dólares, conforme observado no histograma.
+
+A única variável qualitativa no presente no conjunto de dados foi a variável Influencer, que indicava o tipo de influenciador contratado para a campanha. Dos valores descritos na tabela, verificamos que trata-se de uma classe balanceada, já que as quantidades de cada uma das categorias consideradas são bastantes próximas, conforme pode ser observado no gráfico abaixo. 
+
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="70%",results='hide'}
+
+#Gráfico de Barras com preenchimento colorido
+# gráfico de contagem
+
+dados %>% 
+  count(Influencer) %>%
+  filter(!is.na(Influencer)) %>% 
+  top_n(10, n) %>%
+  ggplot() +
+  geom_col(
+    aes(x = Influencer, y = n, fill = Influencer),
+    show.legend = FALSE
+  )
+```
+
+###  Figura 2 - Visualização da variável qualitativa do banco de dados
+
+### Relações entre as variáveis
+
+Na tentativa de avaliar se havia alguma relação entre as variáveis quantitativas e a variável qualitativa em nosso conjunto de dados, foram construídos quatro boxplots para cada uma das variáveis, por cada uma das categorias de tipo de influenciador.
+
+Conforme é possível notar dos gráficos abaixo, não houve grande diferença entre as distribuições das variáveis ao considerar as separações pela categoria de influenciador. A única variável em que foi possível observar algum tipo de relação (não indicada pela mediana, mas pela quantidade de outliers e valores superiores) foi a variável Social Media, o que faz bastante sentido visto que influenciadores atuam essencialmente em mídias sociais, portanto é de se esperar uma diferença de investimento a depender da categoria a qual o influenciador se enquadra (influenciadores macro cobrarão valores mais altos, por exemplo).
+
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+
+
+# Boxplots
+plot1 = dados %>%  ggplot(aes(x = Influencer, y = Sales, fill = Influencer)) +
+  geom_boxplot() +
+  labs(title = "Vendas por categoria de influencer",
+       x = "Tipo de influencer", y = "Volume de vendas em milhões ($)") +
+  scale_fill_discrete("Influencer") +
+  theme_minimal()
+
+plot2 = dados %>%  ggplot(aes(x = Influencer, y = TV, fill = Influencer)) +
+  geom_boxplot() +
+  labs(title = "Investimento em TV por categoria de influencer",
+       x = "Tipo de influencer", y = "Investimento em TV em milhões ($)") +
+  scale_fill_discrete("Influencer") +
+  theme_minimal()
+
+plot3 = dados %>%  ggplot(aes(x = Influencer, y = Radio, fill = Influencer)) +
+  geom_boxplot() +
+  labs(title = "Investimento em Radio por categoria de influencer",
+       x = "Tipo de influencer", y = "Investimento em Radio em milhões ($)") +
+  scale_fill_discrete("Influencer") +
+  theme_minimal()
+
+plot4 = dados %>%  ggplot(aes(x = Influencer, y = Social.Media, fill = Influencer)) +
+  geom_boxplot() +
+  labs(title = "Investimento em Social Media por categoria de influencer",
+       x = "Tipo de influencer", y = "Investimento em Social Media em milhões ($)") +
+  scale_fill_discrete("Influencer") +
+  theme_minimal()
+
+par(mfrow=c(2,2))
+plot1
+plot2
+plot3
+plot4
+
+```
+
+### Figura 3 - Boxplots por tipo de influenciador.
+
+As relações entre as variáveis quantitativas foram observadas a partir do gráfico de calor abaixo, que apresenta as correlações relativas a cada par de variável.
+
+Conforme podemos notar, todas as correlações observadas são positivas, sendo as mais fortes entre TV e Vendas (aproximadamente 1) e TV e Radio (0.9), o que já aponta para a importância do investimento em TV em campanhas de marketing.
+
+
+
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="70%",results='hide'}
+
+
+#Correlações
+
+library(GGally)
+ggcorr(dados, label=T)
+
+```
+
+### Figura 4 - Correlações entre as variáveis.
+
+Por fim, avaliamos todas as variáveis em conjunto, avaliando seus gráficos dispersão, comprovando mais uma vez as relações lineares, a correlação linear quase perfeita entre as variáveis TV e Vendas, bem como a falta de padrão encontrada entre as categorias da variável Influencer.
+
+Todas essas relações podem ser obervadas no gráfico abaixo.
+
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="75%",results='hide'}
+
+
+dados = dados %>%
+  relocate(Influencer)
+
+ggpairs(dados, columns = 2:5, ggplot2::aes(colour=Influencer))
+
+```
+
+### Figura 5 - Diagramas de dispersão das variáveis.
+
+Partimos então para a proposição de alguns modelos para avaliar mais a fundo estas relações.
+
 ## Modelo com o método Forward
 
-  O modelo com o método *Forward* foi de forma $Sales_i=-0,10+3,56\cdot TV_i-0,004\cdot Radio_i+0,004\cdot Social.Media_i+0,01\cdot InfluencerMega_i-0,05\cdot InfluencerMicro-0,07\cdot InfluencerNano_i$, ou seja caso o investimento em TV seja de 1 milhão de unidades monetárias (U.M.), não seja feito investimento em rádio, e o investimento em mídias sociais seja de 100 milhões com a colaboração de um Mega Influencer espera-se que em média o valor das vendas seja de 7,47 milhões U.M., para todos os outros tipos de influencers há de se esperar que haja um efeito negativo sobre o número de vendas, sendo melhor investir no Mega Influencer. Além disso um efeito negativo sobre as vendas ocorre ao se investir em propagandas no rádio, sendo interessante evitar este meio de divulgação e focar em outros que possam trazer mais retorno.
+  O modelo com o método *Forward* foi de forma $$\begin{split} Sales_i=-0,10+3,56\cdot TV_i-0,004\cdot Radio_i+0,004\cdot Social.Media_i+  \\ 0,01\cdot InfluencerMega_i-0,05\cdot InfluencerMicro-0,07\cdot InfluencerNano_i \end{split}$$, ou seja caso o investimento em TV seja de 1 milhão de unidades monetárias (U.M.), não seja feito investimento em rádio, e o investimento em mídias sociais seja de 100 milhões com a colaboração de um Mega Influencer espera-se que em média o valor das vendas seja de 7,47 milhões U.M., para todos os outros tipos de influencers há de se esperar que haja um efeito negativo sobre o número de vendas, sendo melhor investir no Mega Influencer. Além disso um efeito negativo sobre as vendas ocorre ao se investir em propagandas no rádio, sendo interessante evitar este meio de divulgação e focar em outros que possam trazer mais retorno.
 
 ### Análise de Diagnóstico - Forward
 
@@ -71,15 +255,20 @@ shapiro.test(modelo$residuals)
 bptest(modelo)
 ```
 
+### Figura 6 - Análise de Resíduos - Forward.
+
+Através da análise de diagnóstico do modelo linear múltiplo ajustado, primeiramente podemos observar que na Figura 6, o gráfico de Resíduos x Valores ajustados não nos mostra nenhum padrão de dispersão dos pontos e a linha  vermelha no meio do gráfico, que deve ser aproximadamente horizontal no zero, também segue esse comportamento. Logo, juntamente com o gráfico Quantil-Quantil, podemos afirmar que os pressupostos de normalidade e linearidade dos resíduos são cumpridos.
+
+Movendo para o gráfico de Escala-Locação, estamos procurando algo parecido com o gráfico de Resíduos x Valores Ajustados, isto é, uma núvem de pontos sem padrão ao redor da linha horizontal vermelha. Desta forma, conseguimos afirmar que o pressuposto da homocedasticidade dos resíduos é cumprida no modelo ajustado.
+
+Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura. Iremos estudar o que fazer com essas observações nos próximos relatórios.
 
 # Modelo com o método Backward/Stepwise
 
-  O modelo com o método *Backward* coincidiu com o ajustado no método *Stepwise* e foi de forma $Sales_i=-0,13+3,56\cdot TV_i$. Portanto caso sejam investidos 1 milhão de U.M. no meio de comunicação da TV, há de se esperar que em média 3,43 milhões de U.M. seja o valor das vendas.
+  O modelo com o método *Backward* coincidiu com o ajustado no método *Stepwise* e foi de forma $$Sales_i=-0,13+3,56\cdot TV_i$$. Portanto caso sejam investidos 1 milhão de U.M. no meio de comunicação da TV, há de se esperar que em média 3,43 milhões de U.M. seja o valor das vendas.
   
 
 ### Análise de diagnóstico - Backward/Stepwise
-
-
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
 dados_reg_semcat <- na.omit(dados)
@@ -98,7 +287,19 @@ shapiro.test(modelo$residuals)
 bptest(modelo)
 ```
 
+### Figura 7 - Análise de Resíduos - Backward/Stepwise.
+
+Da mesma forma como no modelo anterior temos que:
+
+Através da análise de diagnóstico do modelo linear múltiplo ajustado, primeiramente podemos observar que na Figura 7, o gráfico de Resíduos x Valores ajustados não nos mostra nenhum padrão de dispersão dos pontos e a linha  vermelha no meio do gráfico, que deve ser aproximadamente horizontal no zero, também segue esse comportamento. Logo, juntamente com o gráfico Quantil-Quantil, podemos afirmar que os pressupostos de normalidade e linearidade dos resíduos são cumpridos.
+
+Movendo para o gráfico de Escala-Locação, estamos procurando algo parecido com o gráfico de Resíduos x Valores Ajustados, isto é, uma núvem de pontos sem padrão ao redor da linha horizontal vermelha. Desta forma, conseguimos afirmar que o pressuposto da homocedasticidade dos resíduos é cumprida no modelo ajustado.
+
+Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura. Iremos estudar o que fazer com essas observações nos próximos relatórios.
+
 # Conclusão
+
+Os ajustes dos modelos através dos métodos de seleção de variáveis escolhidos foram satisfatórios, embora a presença de possíveis outliers tenha sido sinalizada. Nas próximas versões dos relatórios do trabalho final iremos explorar melhor qual modelo escolher através de métricas como AIC, BIC, entre outras e estudar o que fazer com as possíveis observações que podem ser outliers.
 
 # Referências
 
