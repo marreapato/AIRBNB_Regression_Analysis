@@ -79,6 +79,8 @@ modelo$coefficients
 
 summary(modelo)
 anova(modelo)
+AIC(modelo)
+BIC(modelo)
 
 modelo$residuals <- studres(modelo)
 
@@ -87,6 +89,14 @@ plot(modelo)
 shapiro.test(modelo$residuals)
 bptest(modelo)
 
+
+library(car)
+
+methods(class="lm")
+
+olsrr::ols_plot_dffits(modelo)
+
+olsrr::ols_plot_resid_lev(modelo)
 
 ###############################333
 
@@ -99,10 +109,26 @@ modelo$coefficients
 
 summary(modelo)
 anova(modelo)
+AIC(modelo)
+BIC(modelo)
 
 modelo$residuals <- studres(modelo)
 plot(modelo)
 
 shapiro.test(modelo$residuals)
 bptest(modelo)
+
+library(car)
+
+methods(class="lm")
+
+olsrr::ols_plot_dffits(modelo)
+
+olsrr::ols_plot_resid_lev(modelo)
+
+#######################################################33
+
+#comparar modelos
+
+
 
