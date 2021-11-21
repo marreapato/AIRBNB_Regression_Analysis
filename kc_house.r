@@ -2,35 +2,107 @@
 #install.packages("ggthemes")
 library(tidyverse)
 library(ggthemes)
-dados <- read.csv("kc_house_data.csv")
+library(MASS)
+library(lmtest)
+dados <- read.csv("Dummy Data HSS.csv")
+options(scipen = 999)
 
-summary(dados)
-mean(dados$bedrooms)
-mean(dados$bathrooms)
+# Medidas descritivas
 
-hist(dados$bathrooms)
-hist(dados$bedrooms)
-hist(dados$sqft_basement)
-hist(dados$sqft_living)
-hist(dados$sqft_above)
-hist(dados$grade)
+# Organizando os dados
+dados <- na.omit(dados)
+dados$Influencer = as.factor(dados$Influencer)
 
-ggplot(dados,aes(x=dados$bedrooms))+geom_histogram()+theme_economist_white()+labs(title="Vista para lagos ou rios")+scale_fill_continuous_tableau()+theme(legend.position = "none")+stat_bin(bins = 20) 
+tabela1 = dados %>% summary(columns = 2:5)
 
-ggplot(dados,aes(y=dados$bedrooms,x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_boxplot()+theme_fivethirtyeight()+labs(title="Vista para lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+# Histogramas
+plot5 = ggplot(dados, aes(x = TV)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("TV") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
 
-#analisar outliers
+plot6 = ggplot(dados, aes(x = Radio)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("Radio") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
 
-ggplot(dados,aes(x=as.factor(dados$waterfront),fill=as.factor(dados$waterfront)))+geom_bar()+theme_fivethirtyeight()+labs(title="Vista para mar, lagos ou rios")+scale_x_discrete(labels=c("Não Possui","Possui"))+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
+plot7 = ggplot(dados, aes(x = Social.Media)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("Mídias Sociais") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
 
-dados$grade_label <- NA
+plot8 = ggplot(dados, aes(x = Sales)) +
+  geom_histogram(color = "white", fill = "lightblue") +
+  theme_classic(base_size = 18) +
+  #scale_x_continuous(breaks = seq(from = 4,to = 8,by = 1), limits = c(4,8)) +
+  ggtitle("Vendas") +
+  xlab("Investimento em milhões ($)") + 
+  ylab("Frequência")
 
-dados$grade_label[dados$grade<=3] <- "Baixa"
-dados$grade_label[dados$grade>3&dados$grade<=10] <- "Média"
-dados$grade_label[dados$grade>=11] <- "Alta"
+par(mfrow=c(1,4))
+plot5
+plot6
+plot7
+plot8
+
+#Gráfico de Barras com preenchimento colorido
+# gráfico de contagem
+
+dados %>% 
+  count(Influencer) %>%
+  filter(!is.na(Influencer)) %>% 
+  top_n(10, n) %>%
+  ggplot() +
+  geom_col(
+    aes(x = Influencer, y = n, fill = Influencer),
+    show.legend = FALSE
+  )
+
+########################################
+
+#modelos e checagem de outliers
+
+dados_reg_semcat <- na.omit(dados)
+dados_reg_semcat$Influencer <- as.factor(dados_reg_semcat$Influencer)
+
+modelo <- step(lm(dados_reg_semcat$Sales~.,data=dados_reg_semcat),direction="forward")
+modelo$coefficients
+
+summary(modelo)
+anova(modelo)
+
+modelo$residuals <- studres(modelo)
+
+plot(modelo)
+
+shapiro.test(modelo$residuals)
+bptest(modelo)
 
 
+###############################333
 
-ggplot(dados,aes(x=as.factor(dados$grade_label),fill=as.factor(dados$grade_label)))+geom_bar()+theme_fivethirtyeight()+labs(title="Avaliação da qualidade do imóvel")+scale_fill_fivethirtyeight()+theme(legend.position = "none") 
 
-cor(dados[,3:14])
+dados_reg_semcat <- na.omit(dados)
+dados_reg_semcat$Influencer <- as.factor(dados_reg_semcat$Influencer)
+
+modelo <- step(lm(dados_reg_semcat$Sales~.,data=dados_reg_semcat),direction="backward")
+modelo$coefficients
+
+summary(modelo)
+anova(modelo)
+
+modelo$residuals <- studres(modelo)
+plot(modelo)
+
+shapiro.test(modelo$residuals)
+bptest(modelo)
+
