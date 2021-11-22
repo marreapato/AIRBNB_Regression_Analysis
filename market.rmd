@@ -1,5 +1,5 @@
 ---
-title: "Marketing and Sales Data - Relatório"
+title: "Dados sobre Marketing e Vendas - Relatório"
 author: "João Vitor, Júnia Ortiz e Lucas Rabelo"
 date: "31/10/2021"
 output: pdf_document
@@ -20,7 +20,7 @@ options(scipen = 999)
 
 # Introdução
 
-  A base de dados$^1$ contêm informações de orçamentos para serem investidos em diferentes meios de comunicação, consta também na base a informação referente ao tipo de *influencer* que colaborará com a campanha de *marketing* nos diferentes meios e a quantidade de vendas realizadas atrelada as diferentes campanhas de *marketing*. 
+  A base de dados$^1$ contêm informações de orçamentos para serem investidos em diferentes meios de comunicação, a documentação da base não informa se são campanhas de *marketing* de qualquer área ou uma área específica, supomos portanto que todas as áreas do setor de vendas estejam contempladas, consta também na base a informação referente ao tipo de *influencer* que colaborará com a campanha de *marketing* nos diferentes meios e a quantidade de vendas realizadas atrelada as diferentes campanhas de *marketing*. 
 
 ## Marketing and Sales Data
 
@@ -69,7 +69,7 @@ dados <- na.omit(dados)
 dados$Influencer = as.factor(dados$Influencer)
 
 tabela1 = dados %>% summary(columns = 2:5)
-
+tabela1 <- na.omit(tabela1)
 knitr::kable(tabela1, align = "c", caption = "Medidas descritivas das variáveis")
 
 ```
