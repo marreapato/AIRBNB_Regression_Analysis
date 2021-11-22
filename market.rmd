@@ -197,9 +197,6 @@ As relações entre as variáveis quantitativas foram observadas a partir do gr�
 
 Conforme podemos notar, todas as correlações observadas são positivas, sendo as mais fortes entre TV e Vendas (aproximadamente 1) e TV e Radio (0.9), o que já aponta para a importância do investimento em TV em campanhas de marketing.
 
-
-
-
 ```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="70%",results='hide'}
 
 
@@ -233,7 +230,7 @@ Partimos então para a proposição de alguns modelos para avaliar mais a fundo 
 
 ## Modelo com o método Forward
 
-  O modelo com o método *Forward* foi de forma $$\begin{split} Sales_i=-0,10+3,56\cdot TV_i-0,004\cdot Radio_i+0,004\cdot Social.Media_i+  \\ 0,01\cdot InfluencerMega_i-0,05\cdot InfluencerMicro-0,07\cdot InfluencerNano_i \end{split}$$, ou seja caso o investimento em TV seja de 1 milhão de unidades monetárias (U.M.), não seja feito investimento em rádio, e o investimento em mídias sociais seja de 100 milhões com a colaboração de um Mega Influencer espera-se que em média o valor das vendas seja de 7,47 milhões U.M., para todos os outros tipos de influencers há de se esperar que haja um efeito negativo sobre o número de vendas, sendo melhor investir no Mega Influencer. Além disso um efeito negativo sobre as vendas ocorre ao se investir em propagandas no rádio, sendo interessante evitar este meio de divulgação e focar em outros que possam trazer mais retorno.
+  O modelo com o método *Forward* foi de forma $$\begin{split} Sales_i=-0,10+3,56\cdot TV_i-0,004\cdot Radio_i+0,004\cdot Social.Media_i+  \\ 0,01\cdot InfluencerMega_i-0,05\cdot InfluencerMicro-0,07\cdot InfluencerNano_i \end{split}$$, ou seja caso o investimento em TV seja de 1 milhão de unidades monetárias (U.M.), não seja feito investimento em rádio, e o investimento em mídias sociais seja de 100 milhões com a colaboração de um *Mega Influencer* espera-se que em média o valor das vendas seja de 7,47 milhões U.M., na variável categórica de *Influencer*, para todos os outros tipos de *influencers* há de se esperar que haja um efeito negativo sobre o número de vendas, sendo melhor investir no *Mega Influencer*. Além disso um efeito negativo sobre as vendas ocorre ao se investir em propagandas no rádio, sendo interessante evitar este meio de divulgação e focar em outros que possam trazer mais retorno.
 
 ### Análise de Diagnóstico - Forward
 
@@ -261,7 +258,23 @@ Através da análise de diagnóstico do modelo linear múltiplo ajustado, primei
 
 Movendo para o gráfico de Escala-Locação, estamos procurando algo parecido com o gráfico de Resíduos x Valores Ajustados, isto é, uma núvem de pontos sem padrão ao redor da linha horizontal vermelha. Desta forma, conseguimos afirmar que o pressuposto da homocedasticidade dos resíduos é cumprida no modelo ajustado.
 
-Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura. Iremos estudar o que fazer com essas observações nos próximos relatórios.
+Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura, o que motivou uma análise mais detalhada de diagnóstico do modelo. 
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+
+library(car)
+
+methods(class="lm")
+
+olsrr::ols_plot_dffits(modelo)
+
+olsrr::ols_plot_resid_lev(modelo)
+
+```
+
+### Figura 7 - Análise de diagnóstico - Forward.
+
+Há também um problema de multicolinearidade do modelo ajustado com o método *Forward*, já que as variáveis dependentes do modelo tiveram uma correlação linear negativa entre si.
 
 # Modelo com o método Backward/Stepwise
 
