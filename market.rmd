@@ -266,6 +266,10 @@ library(car)
 
 methods(class="lm")
 
+R2_mod1 <- 0.999
+aic_mod1 <- AIC(modelo)
+bic_mod1 <- BIC(modelo)
+
 olsrr::ols_plot_dffits(modelo)
 
 olsrr::ols_plot_resid_lev(modelo)
@@ -314,6 +318,10 @@ Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita 
 library(car)
 
 methods(class="lm")
+R2_mod2 <- 0.999
+aic_mod2 <- AIC(modelo)
+bic_mod2 <- BIC(modelo)
+
 
 olsrr::ols_plot_dffits(modelo)
 
@@ -325,7 +333,19 @@ olsrr::ols_plot_resid_lev(modelo)
 
 # Conclusão
 
-Os ajustes dos modelos através dos métodos de seleção de variáveis escolhidos foram satisfatórios, embora a presença de possíveis outliers tenha sido sinalizada. Nas próximas versões dos relatórios do trabalho final iremos explorar melhor qual modelo escolher através de métricas como AIC, BIC, entre outras e estudar o que fazer com as possíveis observações que podem ser outliers.
+Os ajustes dos modelos através dos métodos de seleção de variáveis escolhidos foram satisfatórios, embora a presença de possíveis outliers tenha sido sinalizada. Nas próximas versões dos relatórios do trabalho final iremos explorar melhor qual modelo escolher através de métricas como R2 ajustado,AIC, BIC.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.show="hold", results='show'}
+
+tabela1 = data.frame("Modelo Forward"=c(paste("R2 =",R2_mod1),paste("BIC =",round(bic_mod1,3)),paste("AIC =",round(aic_mod1,3))),
+                     "Modelo Stepwise/Backward"=c(paste("R2 =",R2_mod2),paste("BIC =",round(bic_mod2,3)),paste("AIC =",round(aic_mod2,3))))
+
+colnames(tabela1) <- c("Modelo Forward","Modelo Stepwise/Backward")
+
+knitr::kable(tabela1, align = "c", caption = "Medidas de Avaliação dos Modelos")
+
+```
+
 
 # Referências
 
