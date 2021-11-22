@@ -258,7 +258,7 @@ Através da análise de diagnóstico do modelo linear múltiplo ajustado, primei
 
 Movendo para o gráfico de Escala-Locação, estamos procurando algo parecido com o gráfico de Resíduos x Valores Ajustados, isto é, uma núvem de pontos sem padrão ao redor da linha horizontal vermelha. Desta forma, conseguimos afirmar que o pressuposto da homocedasticidade dos resíduos é cumprida no modelo ajustado.
 
-Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura, o que motivou uma análise mais detalhada de diagnóstico do modelo. 
+Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura, o que motivou uma análise mais detalhada de diagnóstico do modelo, ilustrada pela **(Figura 7)**, pelo gráfico do DFFITS diversos valores discrepantes foram encontrados, assim como pelo gráfico de Outliers e pontos de alavanca, de fato não havia nada de anormal que pudesse ser identificado sem a presença de um pesquisador da área de marketing, portanto como o ajuste do modelo foi satisfatório decidimos por manter os valores identificadas nos gráficos. 
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
 
@@ -280,7 +280,6 @@ Há também um problema de multicolinearidade do modelo ajustado com o método *
 
   O modelo com o método *Backward* coincidiu com o ajustado no método *Stepwise* e foi de forma $$Sales_i=-0,13+3,56\cdot TV_i$$. Portanto caso sejam investidos 1 milhão de U.M. no meio de comunicação da TV, há de se esperar que em média 3,43 milhões de U.M. seja o valor das vendas.
   
-
 ### Análise de diagnóstico - Backward/Stepwise
 
 ```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
@@ -300,15 +299,29 @@ shapiro.test(modelo$residuals)
 bptest(modelo)
 ```
 
-### Figura 7 - Análise de Resíduos - Backward/Stepwise.
+### Figura 8 - Análise de Resíduos - Backward/Stepwise.
 
 Da mesma forma como no modelo anterior temos que:
 
-Através da análise de diagnóstico do modelo linear múltiplo ajustado, primeiramente podemos observar que na Figura 7, o gráfico de Resíduos x Valores ajustados não nos mostra nenhum padrão de dispersão dos pontos e a linha  vermelha no meio do gráfico, que deve ser aproximadamente horizontal no zero, também segue esse comportamento. Logo, juntamente com o gráfico Quantil-Quantil, podemos afirmar que os pressupostos de normalidade e linearidade dos resíduos são cumpridos.
+Através da análise de diagnóstico do modelo linear múltiplo ajustado, primeiramente podemos observar que na **Figura 8**, o gráfico de Resíduos x Valores ajustados não nos mostra nenhum padrão de dispersão dos pontos e a linha  vermelha no meio do gráfico, que deve ser aproximadamente horizontal no zero, também segue esse comportamento. Logo, juntamente com o gráfico Quantil-Quantil, podemos afirmar que os pressupostos de normalidade e linearidade dos resíduos são cumpridos.
 
 Movendo para o gráfico de Escala-Locação, estamos procurando algo parecido com o gráfico de Resíduos x Valores Ajustados, isto é, uma núvem de pontos sem padrão ao redor da linha horizontal vermelha. Desta forma, conseguimos afirmar que o pressuposto da homocedasticidade dos resíduos é cumprida no modelo ajustado.
 
-Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura. Iremos estudar o que fazer com essas observações nos próximos relatórios.
+Por fim o gráfico de Resíduos x Leverage nos indica possívels casos de muita influência no modelo, i.e outliers, pontos que podem influenciar muito a análise e talvez devam ser excluídos. Assim, podemos observar a presença de 3 possíveis observações que podem ser outliers. É importante observar que essas observações também são sinalizadas nos outros gráficos da figura. Similar ao que ocorreu com o modelo *Forward* essas observações motivaram uma análise mais detalhada de diagnóstico ilustrada na **(Figura 9)**, onde diversos valores que  poderiam ser categorizados como pontos de influência ou *Outliers*, foram encontrados, mas pelo ajuste do modelo ter sido favorável e ausência de um pesquisador da área de *marketing*, decidimos por manter as observações.
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+
+library(car)
+
+methods(class="lm")
+
+olsrr::ols_plot_dffits(modelo)
+
+olsrr::ols_plot_resid_lev(modelo)
+
+```
+
+### Figura 9 - Análise de Diagnóstico - Backward/Stepwise.
 
 # Conclusão
 
