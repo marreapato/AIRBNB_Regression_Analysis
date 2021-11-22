@@ -79,8 +79,9 @@ modelo$coefficients
 
 summary(modelo)
 anova(modelo)
-AIC(modelo)
-BIC(modelo)
+R2_mod1 <- 0.999
+aic_mod1 <- AIC(modelo)
+bic_mod1 <- BIC(modelo)
 
 modelo$residuals <- studres(modelo)
 
@@ -108,9 +109,10 @@ modelo <- step(lm(dados_reg_semcat$Sales~.,data=dados_reg_semcat),direction="bac
 modelo$coefficients
 
 summary(modelo)
+R2_mod2 <- 0.999
 anova(modelo)
-AIC(modelo)
-BIC(modelo)
+aic_mod2 <- AIC(modelo)
+bic_mod2 <- BIC(modelo)
 
 modelo$residuals <- studres(modelo)
 plot(modelo)
@@ -127,8 +129,6 @@ olsrr::ols_plot_dffits(modelo)
 olsrr::ols_plot_resid_lev(modelo)
 
 #######################################################33
-
-#comparar modelos
 
 
 
