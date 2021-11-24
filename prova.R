@@ -80,7 +80,118 @@ knitr::kable(tabela2, align = "c", caption = "Anova do DBC")
 
 Logo o delineamento em blocos não ficou bem feito, além disso pelo teste Tukey, realizado com a função ```dbc(trat,bloco,resposta)``` o Aipim Bravo e o Mamão estavam no mesmo grupo, não havendo um grupo isolado, talvez seria melhor rever o delineamento para este experimento.
 
-##
+# Questão 3
+
+Com o objetivo de estudar os efeitos de vários fatores na tintura para um tecido misto de fibra de algodão e de fibra sintética, usado na fabricação de camisas, dentre algumas medidas descritivas tivemos uma média de 31,2, e o terceiro quartil indicando que 75% das observações tem um valor de resposta até 36. este comportamento fica claro na **tabela 3** abaixo. Além disso outras medidas descritivas como a mediana indicam que até metáde está indo até 34.
+
+```{r, echo = F, warning=F, include=F}
+
+operador <- c(1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,3,1,1,1,2,2,2,3,3,
+                  3,1,1,1,2,2,2,3,3,3)
+
+tempo <- c(10, 10, 10, 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,15,15,15,15,15,15,15,15,15,15,15,
+                 15,15,15,15,15,15,15,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20)
+
+resposta<- c(23,24,25,27,28,26,31,32,28,24,23,28,38,36,35,34,36,39,36,35,36,34,38,39,33,34,35,37,39,
+                   35,34,38,36,34,36,31,28,24,27,35,35,34,26,27,25,26,29,25,36,37,34,28,26,34)
+
+temperatura <- c(300,300,300,300,300,300,300,300,300,350,350,350,350,350,350,350,350,350,300,300,300,300,
+               300,300,300,300,300,350,350,350,350,350,350,350,350,350,300,300,300,300,300,300,300,300,
+              300,350,350,350,350,350,350,350,350,350)
+
+
+dados <- data.frame(operador,tempo,resposta,temperatura)
+
+
+### Configurando as variaveis
+
+#### Fator 1
+fatorTempo = dados$tempo
+is.factor(fatorTempo)
+
+fatorTempo = as.factor(fatorTempo)
+is.factor(fatorTempo)
+
+#### Fator 2
+fatorTemperatura = dados$temperatura
+is.factor(fatorTemperatura)
+
+fatorTemperatura = as.factor(fatorTemperatura)
+is.factor(fatorTemperatura)
+
+#### Fator 3
+fatorOperador = dados$operador
+is.factor(fatorOperador)
+
+fatorOperador = as.factor(fatorOperador)
+is.factor(fatorOperador)
+
+#### Resposta
+resposta = dados$resposta
+resposta
+```
+
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+$\ $
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.show="hold", results='show'}
+
+tabela1 = dados$resposta %>% summary()
+knitr::kable(as.matrix(round(tabela1,2)), align = "c", caption = "Medidas descritivas das variáveis")
+
+
+```
+
+Na contagem de fatores tivemos 3 tratamentos de cada combinação, além disso na **Figura 3**, para o fator operador tivemos três valores atípicos no segundo nível, parece haver visualmente alguma diferença neste nível.
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="50%",results='hide'}
+#Fator 1
+boxplot(resposta~fatorTempo)
+
+#Fator 2
+boxplot(resposta~fatorTemperatura)
+
+#Fator 3
+boxplot(resposta~fatorOperador)
+
+```
+
+**Figura 3 - ** Boxplots dos Fatores.
+
+Para o delineamento tivemos na tabela Anova, após utilizar a função ```fat3.dic()```,
+do pacote ExpDes.pt, n´´os tivemos interações significativas a um nível de 5% de significância entre os fatores Tempo do Ciclo e Temperatura, Tempo do Ciclo e Operador,
+Tempo do Ciclo e Temperatura e Operador. Além disso, também a um nível de 5% de significãncia, de forma independente os efeitos de todos os 3 fatores tem alguma influência sobre a variável reposta. Além de passarem nos testes de normalidade dos resíduos e homocedasticidade. Na **Figura 4**, vemos que os pressupostos de homocedasticidade e normalidade dos resíduos foram atingidos.
+
+
+```{r echo=FALSE,warning=FALSE,message=FALSE, fig.show="hold", out.width="90%",results='hide'}
+
+# Usando o ExpDes
+require(ExpDes.pt)
+
+modelo <- fat3.dic(fator1 = fatorTempo,
+                   fator2 = fatorTemperatura,
+                   fator3 = fatorOperador,
+                   resp = resposta,
+                   fac.names = c("Tempo do Ciclo","Temperatura", "Operador"))
+
+
+# Analise dos residuos
+plotres(modelo)
+
+```
+
+**Figura 3 - ** Análise de Resíduos do Delineamento de Fatores.
 
 # Apêndice
 
